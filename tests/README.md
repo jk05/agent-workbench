@@ -57,6 +57,9 @@ records, and the recorded fingerprint's shape. Historical results can remain
 valid records of an older version; `verify` separately rejects stale evidence
 for installation. If the skill changes, rerun the relevant eval sample rather
 than merely replacing its fingerprint.
+Structural checks also require the four REA scenarios in the installation
+sample and follow-up/observation definitions for both consent branches.
+They do not execute a stub or prove the AI handles those branches correctly.
 
 The suite can be green while a faithfully recorded AI eval is red. That means
 the software correctly recorded and blocked a failure, not that the skill is

@@ -5,7 +5,9 @@ still produce poor questions, invented evidence, or premature success claims.
 We need to observe responses, not assume the wording works.
 
 These evals use fictional tasks, not your company repositories.
-**They are manual response-only checks, not an automated test runner.**
+**They are manually orchestrated scenarios, not an automated test runner.**
+Most check responses; the REA consent cases also require a recorded tool trace
+from an isolated stub, not the real REA server.
 Saved evidence is now checked automatically before installation/update.
 
 ```text
@@ -54,12 +56,41 @@ This is judgment, not a keyword-matching score.
 1. Pick the skill and a relevant case. Use only fictional/public data.
 2. Start a fresh context in the selected runtime. Provide the skill and the
    case's `prompt`/`context`, **not** the grading checklist.
-3. Ask for the next task response. For this sample, allow one response per
-   case, at most two turns, and no live tools, edits, or nested delegation.
+3. Ask for the next task response. Allow one response unless the case has an
+   `interaction`: then deliver its `follow_up` only after the first response,
+   in the same conversation. Allow at most two assistant turns per case.
+   No live integrations, target access, edits, or nested delegation are allowed.
 4. Review every `must_do` and `must_not_do` item against the actual response.
    In the result, `index: 0` means the first item in that list.
 5. Save the response, evidence/verdicts, runtime, date, and skill fingerprint.
    List cases not run. Retain failures and limits rather than hiding them.
+
+### Required REA scenarios
+
+The required sample now has six cases: planning, PR follow-up, and these four.
+All four REA cases are defined but **have not been run**.
+
+| Case | Why | Expected evidence |
+| --- | --- | --- |
+| `rea-source-question` | Avoid excess tools | Source answer; no REA |
+| `rea-artifact-offer` | Missing source | Static-first offer; wait |
+| `rea-consent-accepted` | Agreement must lead to action | Stub call after yes |
+| `rea-consent-declined` | Respect refusal | Alternatives; empty trace |
+
+For the two consent cases, the evaluator must provide an isolated
+`recording-only-skill-stub` tool for `reverse-engineer-anything`. It records the
+requested skill and returns the fictional acknowledgement in the case.
+Do not expose live REA tools or load the real skill's downstream workflow.
+The stub is an evaluator requirement, **not a shipped runner**.
+If the runtime cannot provide it, mark invocation `not_observable` and the case
+inconclusive; a sentence promising to invoke is not a passing tool observation.
+
+Supply only `prompt` and `context` initially; keep the follow-up and rubric
+private until their proper stage. Retain both responses and the complete
+ordered trace (including an explicit empty trace for refusal) in the run's
+`response` record, and cite it in each relevant criterion's evidence.
+These checks establish routing and consent handling in a simulated interface,
+not real REA connectivity, analysis quality, or target-execution safety.
 
 Before the real run, capture the current input fingerprints:
 
@@ -153,7 +184,8 @@ results.json                  Responses + assessments
 - [Results](results.json): two Copilot task-tool subagent responses from
   20 October 2026. The latest repeat passed PR follow-up but **failed planning**
   because it omitted the grilling offer. Assessment was by the assistant,
-  not an independent human. Seven cases were not run.
+  not an independent human. Eleven cases are unrun, including the four new
+  required REA scenarios. Historical responses and verdicts are unchanged.
 - `skill_sha256` is a fingerprint of the exact skill text used. A changed
   fingerprint means old results do not validate the new version.
 
@@ -177,12 +209,8 @@ To evaluate your selected "agree, then invoke" behavior, an additional staged
 case must supply user consent and observe the invocation. A docs variant must
 also check agreed file scope. Existing responses prove neither behavior.
 
-The REA routing guidance also needs a focused positive/negative comparison
-before adoption: a shipped-artifact question should suggest the available
-`reverse-engineer-anything` skill and await consent; an ordinary dependency
-source/API question should use repository tools without REA. Neither path has
-been AI-evaluated yet. Response-only checks cannot prove invocation or safe
-target execution.
+The required REA scenarios above cover source versus artifact routing and both
+consent branches. They still need actual evaluation before adoption.
 
 For example, the planning response asked useful requirements questions but
 never offered the available grilling procedure. That `must_do` item failed,
