@@ -177,6 +177,13 @@ To evaluate your selected "agree, then invoke" behavior, an additional staged
 case must supply user consent and observe the invocation. A docs variant must
 also check agreed file scope. Existing responses prove neither behavior.
 
+The REA routing guidance also needs a focused positive/negative comparison
+before adoption: a shipped-artifact question should suggest the available
+`reverse-engineer-anything` skill and await consent; an ordinary dependency
+source/API question should use repository tools without REA. Neither path has
+been AI-evaluated yet. Response-only checks cannot prove invocation or safe
+target execution.
+
 For example, the planning response asked useful requirements questions but
 never offered the available grilling procedure. That `must_do` item failed,
 so the case failed despite the rest being sensible. Retain that evidence;
