@@ -27,7 +27,10 @@ Why these boundaries matter:
 - Project commands and private company knowledge stay authoritative in the
   project, not duplicated into personal guidance. Tilt, for example, is a
   project concern, not a generic workflow dependency.
-- Skills remain readable and portable in intent. Copilot-specific discovery
+- Skills use the open [Agent Skills format](https://agentskills.io/home) to
+  package instructions and optional resources for reuse, rather than inventing
+  a workbench-specific format. This is a packaging choice, not a separate
+  runtime or proof of cross-runtime compatibility. Copilot-specific discovery
   stays in the helper and [runtime notes](copilot-discovery.md).
 - Private handoffs and credentials stay outside source control.
 - Existing tools and skills are reused where suitable; avoid new wrappers

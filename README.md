@@ -7,6 +7,11 @@ Why: keep your working preferences in one place, instead of repeating them
 in every project. **Engineering Workbench is the first skill, not a limit
 on what this repo can contain.**
 
+Skills use the open [Agent Skills format](https://agentskills.io/home):
+a folder with `SKILL.md` instructions and optional supporting files.
+The format is portable; installation and runtime behavior still need checking
+for each agent.
+
 ```text
 THIS REPO                          YOUR PERSONAL SKILLS
 Skills + helper + checks           ~/.agents/skills/<selected-skill>/
