@@ -104,6 +104,10 @@
     }
   ],
   "not_run": [
+    "rea-source-question",
+    "rea-artifact-offer",
+    "rea-consent-accepted",
+    "rea-consent-declined",
     "mechanical-task",
     "consequential-ambiguity",
     "workspace-policy",

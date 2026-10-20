@@ -44,6 +44,33 @@ class ExampleSkillEvalTests(unittest.TestCase):
                 self.assertTrue(case["context"])
         self.assertTrue(set(execution["sample_case_ids"]) <= set(ids))
 
+    def test_rea_routing_and_consent_cases_are_required(self):
+        cases = json.loads((ROOT / "evals/cases.json").read_text())
+        by_id = {case["id"]: case for case in cases["cases"]}
+        required = {
+            "rea-source-question",
+            "rea-artifact-offer",
+            "rea-consent-accepted",
+            "rea-consent-declined",
+        }
+        self.assertTrue(required <= set(cases["execution"]["sample_case_ids"]))
+        for identifier in required:
+            case = by_id[identifier]
+            for field in (
+                "workspace_policy",
+                "workspace_evidence",
+                "availability",
+                "approvals",
+            ):
+                self.assertTrue(case["context"][field].strip())
+        for identifier in ("rea-consent-accepted", "rea-consent-declined"):
+            interaction = by_id[identifier]["interaction"]
+            self.assertEqual(interaction["harness"], "recording-only-skill-stub")
+            self.assertTrue(interaction["follow_up"].strip())
+            self.assertTrue(interaction["required_observation"].strip())
+        self.assertNotIn("interaction", by_id["rea-source-question"])
+        self.assertNotIn("interaction", by_id["rea-artifact-offer"])
+
     def test_historical_results_cover_criteria_and_identify_the_tested_version(self):
         cases = json.loads((ROOT / "evals/cases.json").read_text())
         results = json.loads((ROOT / "evals/results.json").read_text())
@@ -57,7 +84,7 @@ class ExampleSkillEvalTests(unittest.TestCase):
         by_id = {case["id"]: case for case in cases["cases"]}
         executed = [run["case_id"] for run in results["runs"]]
         self.assertEqual(len(executed), len(set(executed)))
-        self.assertEqual(set(executed), set(cases["execution"]["sample_case_ids"]))
+        self.assertTrue(set(executed) <= set(by_id))
         self.assertEqual(set(executed) | set(results["not_run"]), set(by_id))
         self.assertFalse(set(executed) & set(results["not_run"]))
         for run in results["runs"]:
