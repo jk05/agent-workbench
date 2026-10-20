@@ -83,6 +83,13 @@ invoke the available chosen procedure once you agree. The docs variant needs
 an agreed document scope. These procedures are optional external skills,
 not installed by this workbench.
 
+For reverse engineering, it should suggest an available
+`reverse-engineer-anything` skill when evidence must come from a shipped binary,
+packaged app, or runtime rather than available source. Simply finding an npm
+package or module is not a reason to use REA: normal source/docs/tests come first.
+As with other procedures, you choose whether to invoke it. Running an unknown
+target or attaching to a process needs explicit permission.
+
 When ready, you can approve a delivery sequence:
 
 > Implement the agreed scope, validate, commit, push, create a draft PR,

@@ -145,8 +145,18 @@ does not establish review completion.
   relevant linked project docs.
 - **Production behavior:** narrowly scoped logs/traces/metrics, such as
   Datadog; avoid unrelated customer data.
-- **Code structure:** local code intelligence/search; CodeGraph or REA only
-  when they add useful evidence.
+- **Code structure and dependencies:** use source, code intelligence/search,
+  documentation, and tests; CodeGraph can help with relationships when useful.
+- **Reverse engineering:** suggest the available `reverse-engineer-anything`
+  skill when the question needs shipped-artifact or requested runtime evidence:
+  binaries, packaged/minified JavaScript, Electron apps, decompilation, or
+  version comparisons not established by source. Explain the target, evidence
+  gap, and any execution/attachment side effects; invoke after agreement.
+  Encountering a package/module alone is not a trigger. Ordinary source,
+  dependency API, and architecture questions stay with repository tools.
+  Use static inspection first where sufficient; executing an unknown target or
+  attaching to a process needs explicit permission. Keep REA optional and
+  preserve useful source-based work if it is unavailable.
 - **UI behavior:** browser inspection and relevant interaction checks.
 - **PR, checks, feedback:** existing GitHub tooling; prefer
   repository-standard CLI commands.
