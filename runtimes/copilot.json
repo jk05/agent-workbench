@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "runtime": "copilot",
+  "personal_skills_directory": ".agents/skills"
+}
