@@ -6,8 +6,8 @@ We need to observe responses, not assume the wording works.
 
 These evals use fictional tasks, not your company repositories.
 **They are manually orchestrated scenarios, not an automated test runner.**
-Most check responses; the REA consent cases also require a recorded tool trace
-from an isolated stub, not the real REA server.
+Most check responses; consent cases also require a recorded tool trace from
+isolated skill/tracker stubs, not real REA or issue-tracker writes.
 Saved evidence is now checked automatically before installation/update.
 
 ```text
@@ -67,7 +67,8 @@ This is judgment, not a keyword-matching score.
 
 ### Required REA scenarios
 
-The required sample now has six cases: planning, PR follow-up, and these four.
+The required sample has twelve cases: planning, PR follow-up, four REA cases,
+and six slicing/scope/follow-up cases below.
 All four REA cases are defined but **have not been run**.
 
 | Case | Why | Expected evidence |
@@ -91,6 +92,33 @@ ordered trace (including an explicit empty trace for refusal) in the run's
 `response` record, and cite it in each relevant criterion's evidence.
 These checks establish routing and consent handling in a simulated interface,
 not real REA connectivity, analysis quality, or target-execution safety.
+
+### Required slicing, scope, and follow-up scenarios
+
+Why: small PRs should preserve useful outcomes, not trade correctness for size;
+extra work should be captured without being silently implemented or published.
+All six scenarios below are defined but **have not been AI-evaluated**.
+
+| Case | Expected evidence |
+| --- | --- |
+| `logical-pr-slices` | Verifiable slices, genuine blockers, safe order |
+| `pr-frontier-progress` | Independent progress; recheck changed dependencies |
+| `smallest-complete-change` | Cohesive MVP, clear code, quality intact |
+| `follow-up-capture` | Reuse ticket; confirm comments; retain safety blockers |
+| `follow-up-approved` | Create then link/comment only after consent |
+| `follow-up-declined` | No writes; retain proposal and continue |
+
+The first four are response-only. The last two use the same two-turn protocol
+as REA consent, with an isolated `recording-only-tracker-stub` exposing only the
+fictional operations and results defined in their contexts. After the first
+response, supply the case's follow-up; retain ordered calls/results or an
+explicit empty trace in the response record. Give neither grading criteria nor
+the later user decision to the candidate initially.
+
+The evaluator must provide this stub; no runner is shipped. Never substitute
+live tracker writes or real ticket creation. If tool observations cannot be
+collected, mark those criteria `not_observable`, not pass. A simulated result
+does not establish real tracker availability, publication, or permissions.
 
 Before the real run, capture the current input fingerprints:
 
@@ -184,8 +212,9 @@ results.json                  Responses + assessments
 - [Results](results.json): two Copilot task-tool subagent responses from
   20 October 2026. The latest repeat passed PR follow-up but **failed planning**
   because it omitted the grilling offer. Assessment was by the assistant,
-  not an independent human. Eleven cases are unrun, including the four new
-  required REA scenarios. Historical responses and verdicts are unchanged.
+  not an independent human. Seventeen cases are unrun, including the ten
+  required REA and slicing/scope/follow-up scenarios. Historical responses and
+  verdicts are unchanged.
 - `skill_sha256` is a fingerprint of the exact skill text used. A changed
   fingerprint means old results do not validate the new version.
 

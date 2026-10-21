@@ -71,6 +71,32 @@ class ExampleSkillEvalTests(unittest.TestCase):
         self.assertNotIn("interaction", by_id["rea-source-question"])
         self.assertNotIn("interaction", by_id["rea-artifact-offer"])
 
+    def test_slicing_scope_and_follow_up_cases_are_required(self):
+        cases = json.loads((ROOT / "evals/cases.json").read_text())
+        by_id = {case["id"]: case for case in cases["cases"]}
+        required = {
+            "logical-pr-slices",
+            "pr-frontier-progress",
+            "smallest-complete-change",
+            "follow-up-capture",
+            "follow-up-approved",
+            "follow-up-declined",
+        }
+        self.assertTrue(required <= set(cases["execution"]["sample_case_ids"]))
+        for identifier in required:
+            for field in (
+                "workspace_policy",
+                "workspace_evidence",
+                "availability",
+                "approvals",
+            ):
+                self.assertTrue(by_id[identifier]["context"][field].strip())
+        for identifier in ("follow-up-approved", "follow-up-declined"):
+            interaction = by_id[identifier]["interaction"]
+            self.assertEqual(interaction["harness"], "recording-only-tracker-stub")
+            self.assertTrue(interaction["follow_up"].strip())
+            self.assertTrue(interaction["required_observation"].strip())
+
     def test_historical_results_cover_criteria_and_identify_the_tested_version(self):
         cases = json.loads((ROOT / "evals/cases.json").read_text())
         results = json.loads((ROOT / "evals/results.json").read_text())

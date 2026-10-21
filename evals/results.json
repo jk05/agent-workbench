@@ -104,6 +104,12 @@
     }
   ],
   "not_run": [
+    "logical-pr-slices",
+    "pr-frontier-progress",
+    "smallest-complete-change",
+    "follow-up-capture",
+    "follow-up-approved",
+    "follow-up-declined",
     "rea-source-question",
     "rea-artifact-offer",
     "rea-consent-accepted",

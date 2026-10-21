@@ -99,6 +99,31 @@ Without publication permission, work stays local with a PR description in chat.
 Conflicting existing instructions need resolving before external actions.
 PR follow-up is bounded; pending feedback can be handed off, not watched forever.
 
+### Small changes, linked follow-ups
+
+The default is the smallest complete change, not reduced quality or a framework
+for hypothetical future needs. Plans consider logical, testable PR slices and
+revisit them as evidence changes; a cohesive small fix can stay in one PR.
+
+```text
+Plan slices + blockers -> build/test A -> A waits for review
+                                               |
+                              Continue approved independent B
+                              C depends on A: agreed base or wait
+
+Discover deferred work -> propose ticket/comment -> your confirmation
+                                                    |
+                                  Link original ticket + follow-up + PR
+```
+
+Useful extra work should be captured, not silently implemented. The agent
+checks for existing tickets, shows the proposed ticket/comment and destination,
+then asks before creating or posting it. This includes comments on the original
+ticket and any useful code comment for a non-obvious limitation. PR descriptions
+link the original ticket and confirmed follow-ups; unapproved items remain
+clearly labelled proposals in the local draft/report or private handoff.
+Declining publication does not stop other approved work.
+
 ## Add another skill
 
 ```text

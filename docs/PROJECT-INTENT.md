@@ -60,6 +60,11 @@ not the entire product. Small changes need small checks; significant changes
 need explicit acceptance criteria, trade-offs, and scope agreement.
 The user should not need to remember every supporting skill's slash command.
 Suggest useful procedures at the right time and respect explicit-only use.
+Default to the smallest complete change with required quality intact. Plan
+logical PR slices and real blockers; continue approved independent work during
+review rather than forcing artificial splits or expanding scope. Capture useful
+deferred work as linked follow-up proposals, confirming ticket/comment writes
+with the user before publishing them.
 
 ## Decisions to preserve
 
