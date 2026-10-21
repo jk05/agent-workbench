@@ -61,7 +61,9 @@ a bounded change; remaining consequential questions are visible.
   criteria, evidence, proposed approach and affected surfaces,
   risks/alternatives, exclusions, and verification strategy. Challenge
   unsupported assumptions, including the user's proposed cause when evidence
-  disagrees.
+  disagrees. Turn vague performance goals into questions about both workload
+  (rows/bytes/concurrency) and measurable completion time/latency; agree the
+  target before selecting an implementation.
 - Consider logical PR slices up front: each needs an outcome, scope/exclusions,
   validation, real blockers, and proposed base/order. Prefer independently
   verifiable, mergeable vertical slices; keep one cohesive PR when splitting
@@ -140,7 +142,8 @@ Report validation gaps rather than calling them passed.
 - While a PR waits, continue other approved, unblocked slices in isolated
   branches/worktrees when safe. Dependent/stacked PRs need an agreed base
   strategy; otherwise report the blocker and work on independent slices.
-  Track each PR's base, head, CI, comments, and dependencies separately.
+  Report each PR's base, head, CI, unresolved comments/threads, and dependencies
+  separately; mark missing state unknown rather than omitting it.
   When a prerequisite changes, recheck affected dependants and validation.
   Waiting is not permission to merge, expand scope, or spawn parallel agents.
 - Diagnose CI failures and review suggestions against approved scope. Fix
@@ -179,9 +182,11 @@ When investigation, implementation, or review exposes useful deferred work:
 - In the PR description (or local draft when publication is not approved), link
   the original ticket and created/existing follow-ups; identify deferred work
   and pending proposals without inventing ticket IDs or implying completion.
-  Check for duplicates before writes/retries. If declined or tools are
-  unavailable, keep an unposted proposal in the report/handoff; do not lose it
-  or block unrelated approved progress.
+  Check for duplicates before writes/retries. If declined, acknowledge once,
+  retain the unposted proposal in the report/handoff, and return to approved
+  work. Leave that publication decision closed unless the user reopens it;
+  omit closing invitations to create or post it later. If tools are unavailable,
+  retain the proposal and continue unrelated approved progress.
 
 ## Capability selection and cost
 

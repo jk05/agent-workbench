@@ -1,0 +1,3 @@
+[environment]
+python = ".local/eval-venv"
+python-version = "3.12"
