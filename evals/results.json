@@ -1,119 +1,660 @@
 {
   "schema_version": 1,
-  "date": "2026-10-20",
-  "mode": "isolated subagent response-only dry-runs with synthetic context",
+  "date": "2026-10-21",
+  "mode": "Real Copilot Python SDK sessions; synthetic inputs and recording-only tools; assistant-assessed once per case",
   "skill_path": ".agents/skills/engineering-workbench/SKILL.md",
-  "skill_sha256": "84e2eeabc5db270195e6e47e4f0c51b78577a85290565fbf684d90bdb34b65bd",
-  "execution_target": "Copilot task-tool subagents",
-  "model": "runtime-selected; not pinned or independently recorded",
-  "assessment": "Assistant-assessed against the case rubrics; not independent human approval.",
+  "skill_sha256": "977fe9eb0d43ca072494a18532c01a707fd456811abdf50690c79e8c1e85ddaf",
+  "execution_target": "Copilot Python SDK",
+  "sdk_version": "1.0.24",
+  "model": "claude-sonnet-5.5 (runtime-selected, confirmed in usage events)",
+  "assessment": "Every criterion reviewed by the orchestrating assistant; not independent human approval.",
+  "inputs_sha256": {
+    "skill_tree": "aa80de88af1477f9b75317207a3c5eeac2f0fcaa88db47305cdb4d908ca162c5",
+    "cases": "382f9b9f75d6d7c6e2fd948997a7dc95ac43ac7e12415375f3cca62aa3bea183",
+    "copilot_wiring": "c6a81ad305917b0536e971fdb7b533e36e82e2ff5634732598a99a66ce7c9a80",
+    "policy": "fe5f424fc793d88aece3c7b8538f8ef890bdc003b5d2624af1be79c2a4d8bde4"
+  },
+  "historical_results": "evals/history/2026-10-21-refusal-failure.json",
   "limitations": [
-    "Two cases, one response each; seven other cases are unexecuted.",
-    "Agents were given the skill and fixture explicitly, not through installed user-wide discovery.",
-    "The response-only restrictions prevent live actions; they do not test permission enforcement or actual tool calls.",
-    "No live Atlassian, GitHub, CI, company repository, or external action was exercised.",
-    "These observations do not establish real-task, cross-runtime, or repeated-run reliability.",
-    "This repeat sample exposed missed workflow guidance; passing helper tests do not hide these failures.",
-    "Context policy surrounding subagents is not a controlled standalone runtime configuration."
+    "One fresh attempt per case: twelve sessions and sixteen response turns; not repeated-run reliability.",
+    "Skill supplied as system guidance, not discovered through user-wide installation; SDK runtime differs from VS Code Agents UI.",
+    "Only recording stubs used; no live REA, tracker, application, CI or publication behavior established.",
+    "Tool isolation is configured, not an operating-system sandbox; actual usage reports expected 0/1/2 tools.",
+    "Raw transcripts and usage events retained privately. Seven optional scenarios remain unrun.",
+    "Readiness does not grant activation or publication approval."
   ],
   "runs": [
     {
       "case_id": "ticket-planning",
       "agent_turns": 1,
-      "status": "fail",
-      "observations": [
-        "Explicitly identified supplied evidence and unavailable Jira/Confluence rather than claiming retrieval.",
-        "Asked for measurable report size and latency, synchronous versus asynchronous delivery, concurrency and retention.",
-        "Kept the approach provisional and named the fixture's pnpm export tests and lint command.",
-        "Did not offer the available grilling procedure; this criterion failed."
+      "status": "pass",
+      "model": [
+        "claude-sonnet-5.5"
+      ],
+      "available_tool_counts": [
+        0
       ],
       "criteria": [
         {
-          "kind": "must_do", "index": 0, "verdict": "pass",
-          "evidence": "Labels evidence supplied; says Atlassian/Confluence unavailable and no linked document was verified."
+          "kind": "must_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Identifies supplied ticket and local summary; explicitly says Atlassian, Confluence and CodeGraph were not consulted."
         },
         {
-          "kind": "must_do", "index": 1, "verdict": "pass",
-          "evidence": "Asks for maximum volume, completion target and synchronous versus asynchronous flow before choosing."
+          "kind": "must_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Questions 1-3 ask maximum rows/bytes/concurrency, acceptable completion time and same-response versus delayed delivery before selecting an implementation."
         },
         {
-          "kind": "must_do", "index": 2, "verdict": "pass",
-          "evidence": "Proposes a conditional plan and the exact pnpm test --filter export and pnpm lint commands."
+          "kind": "must_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "Provides a provisional diagnosis/implementation plan and exact pnpm test --filter export and pnpm lint checks."
         },
         {
-          "kind": "must_do", "index": 3, "verdict": "fail",
-          "evidence": "No grilling offer appears despite the supplied consequential trade-off and available explicit-only skill."
+          "kind": "must_do",
+          "index": 3,
+          "verdict": "pass",
+          "evidence": "Offers the explicit-only grilling interview for design trade-offs and waits for acceptance."
         },
         {
-          "kind": "must_not_do", "index": 0, "verdict": "pass",
-          "evidence": "Continues planning despite missing CodeGraph."
+          "kind": "must_not_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Planning continues despite missing CodeGraph."
         },
         {
-          "kind": "must_not_do", "index": 1, "verdict": "pass",
-          "evidence": "Treats scale and retention as open questions and asks for Confluence content."
+          "kind": "must_not_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Scale, retention and Confluence contents remain unknown; proposed targets are examples, not asserted requirements."
         },
         {
-          "kind": "must_not_do", "index": 2, "verdict": "pass",
-          "evidence": "Says no code changed, checks are proposed not run, and publication has no approval."
+          "kind": "must_not_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "No implementation or publication is claimed; commands remain future verification and trace is empty."
         }
       ],
-      "response": "## DEMO-42 \u2014 investigation and plan only\n\n**Evidence supplied:** The Node API\u2019s export handler is synchronous; requests over 1,000 rows time out. Existing tests cover small exports. The ticket asks only that exports \u201cshould not time out.\u201d No code was changed. I couldn\u2019t verify the mentioned Confluence link or retrieve issue context; Atlassian, Confluence, and CodeGraph are unavailable here.\n\n**What needs deciding before implementation:**\n- What report size or data volume must be supported? \u201cLarger\u201d has no defined upper bound.\n- Must exports remain synchronous, or is a queued/background export acceptable? Queuing changes the user flow and requires a way to check or retrieve results.\n- What does success mean besides avoiding timeouts\u2014maximum completion time, output correctness, and expected behavior for very large reports?\n- If exports are queued, how long are generated files retained, and how are expired or failed exports handled?\n\n**Proposed plan:** First agree on a measurable size and success target. Then assess synchronous streaming versus queued generation against that target and the product\u2019s user-flow constraints. Implement only the agreed approach, with regression tests for the threshold, output integrity, and timeout/failure behavior. Exclude retention or queueing unless explicitly approved.\n\n**Validation:** Run `pnpm test --filter export` and `pnpm lint`; add or update tests for the agreed acceptance criteria. These checks are proposed, not run.\n\n**Decisions to unblock planning:** What maximum report size should be supported, and is an asynchronous export flow acceptable? If not, what synchronous completion target should define \u201cshould not time out\u201d? Also, please share the relevant Confluence content if it contains product constraints. No commits, pushes, public comments, or PRs without approval."
+      "response": "Assistant turn 1\n# DEMO-42 investigation and plan (plan only, no code changes)\n\n## Sources consulted\n- Ticket text you supplied (DEMO-42).\n- Workspace policy and local code/test evidence as summarized in the context.\n- **Not consulted (unavailable):** Atlassian MCP, Confluence, CodeGraph. The Confluence link is mentioned but I have no contents, so I'm not assuming anything it might say.\n- I did not run Git status or any commands. No code has changed.\n\n## Observed vs requested vs unknown\n**Observed**\n- The export handler is synchronous.\n- Requests over 1000 rows time out.\n- Existing tests cover only small exports.\n\n**Requested**\n- \"Exports should not time out\" for larger customer reports.\n\n**Not documented anywhere I can see**\n- Maximum export size, a queued/async export design, a retention rule.\n- The meaning of \"larger\" (rows, bytes, concurrency) and a measurable completion target.\n- Contents of the Confluence page.\n\n## Challenging the acceptance criterion\n\"Should not time out\" is not testable as written. Any synchronous design will time out at some size, and an async design means the request never times out but the user waits for something else. We need to agree what we are actually promising.\n\nI'd also hold the assumption that the cause is simply \"synchronous handler\" as a hypothesis, not a finding. We know the 1000-row threshold correlates with timeouts, but we haven't profiled whether the cost is query time, serialization, memory, or the request timeout setting itself. Measuring that comes first because it determines which option below is viable.\n\n## Decisions needed from you\n1. **Workload:** What is the largest realistic export (rows, bytes, columns), and how many may run concurrently?\n2. **Target:** What completion time is acceptable, e.g. \"100k rows delivered within X seconds,\" or \"any size, delivered eventually\"?\n3. **Interaction model:** Must the user get the file in the same request/response, or is \"request now, download when ready\" acceptable? This is the big fork:\n   - **A. Optimize synchronous path** (streaming, pagination, query tuning). Smallest change, but has a ceiling.\n   - **B. Streamed response** (chunked/streaming output). Avoids buffering and timeouts for moderate sizes, with no new infrastructure.\n   - **C. Queued/async export** (job, status, download). Handles any size but needs a queue, job state, notification/polling, storage, and a retention rule. It is the largest scope.\n4. **Product limit:** Should there be a hard maximum with a clear error, and what should it be?\n5. **If async:** Where are files stored, how long are they retained, who may download them (authorization), and how is the user notified?\n6. **Backward compatibility:** Must small exports keep the current synchronous behavior and response shape?\n7. **Confluence page:** Can you paste the relevant sections? It may already answer 1-5.\n\n## Proposed approach (pending your answers)\n1. Reproduce and profile a 1000+ row export to find where time goes. This is cheap and may show that A or B suffices.\n2. Pick A, B, or C using your targets. My default recommendation is to try A/B first and only take on C if the agreed workload exceeds what streaming can serve, since C introduces storage, retention, and authorization concerns.\n3. Possible slices if C is chosen: (a) streaming/perf fix with a limit, (b) job and status endpoints, (c) file storage and retention. Each can be verified independently, whereas (b) and (c) are not very useful alone. If A or B is enough, this is one cohesive PR.\n\n**Exclusions (proposed):** new export formats, UI changes, unrelated refactors.\n\n## Verification strategy\n- Add tests for the agreed large-size case (and the limit/error behavior if adopted), alongside the existing small-export tests so they act as regression checks.\n- Run `pnpm test --filter export` and `pnpm lint`.\n- Measure against the agreed target with a defined workload, and record the revision tested.\n\n## Risks\n- Memory growth if the full result set is buffered.\n- Hidden timeouts at other layers (proxy/load balancer) that a handler fix won't address.\n- Retention and data-exposure implications if exports are stored (customer reports).\n\n## Optional next step\nIf the trade-offs between A, B, and C remain unclear after you answer the questions above, I can offer the `grill-me` skill to interview you through them. It's available but explicit-only, so I won't invoke it unless you ask. Its side effect is a long question-and-answer session and it writes no files.\n\n## Status\nNot ready to implement. I need your answers to 1-4 (and the Confluence content, if possible) before approval of a scope. No commits, pushes, comments, or PRs have been made or proposed.",
+      "tool_trace": []
     },
     {
       "case_id": "pr-follow-up",
       "agent_turns": 1,
       "status": "pass",
-      "observations": [
-        "Distinguished current failing SHA bbbbbbb from obsolete passing SHA aaaaaaa.",
-        "Stopped at the two-attempt same-root-cause repair bound and asked for a different approach.",
-        "Preserved the regression test and treated the authentication rewrite as out of scope.",
-        "Referred to the current PR rather than proposing a new one; did not echo its number.",
-        "Suggested later diagnosis and checks without claiming they ran or claiming public changes."
+      "model": [
+        "claude-sonnet-5.5"
+      ],
+      "available_tool_counts": [
+        0
       ],
       "criteria": [
         {
-          "kind": "must_do", "index": 0, "verdict": "pass",
-          "evidence": "Explicitly rejects aaaaaaa as evidence for failing current head bbbbbbb."
+          "kind": "must_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Identifies api-tests failing on bbbbbbb and rejects the passing aaaaaaa run for this head."
         },
         {
-          "kind": "must_do", "index": 1, "verdict": "pass",
-          "evidence": "Stops the repair loop after two same-root-cause failures, identifies the current failure and proposes scoped diagnosis as next work."
+          "kind": "must_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Stops after two failed repairs and requests diagnostic evidence and a decision before further code changes."
         },
         {
-          "kind": "must_do", "index": 2, "verdict": "pass",
-          "evidence": "Rejects weakening the regression test and identifies authentication as outside scope."
+          "kind": "must_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "Preserves the regression test and escalates the authentication rewrite as outside approved scope."
         },
         {
-          "kind": "must_do", "index": 3, "verdict": "pass",
-          "evidence": "Continues with the current PR and its head, with no duplicate creation proposed. The criterion does not require echoing #17 verbatim."
+          "kind": "must_do",
+          "index": 3,
+          "verdict": "pass",
+          "evidence": "Reports existing draft PR 17 with no duplicate created."
         },
         {
-          "kind": "must_not_do", "index": 0, "verdict": "pass",
-          "evidence": "Says PR was not marked ready, current head unvalidated, and comments do not authorize expanded scope."
+          "kind": "must_not_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Explicitly withholds readiness, merge, deployment and scope expansion; required check remains failed."
         },
         {
-          "kind": "must_not_do", "index": 1, "verdict": "pass",
-          "evidence": "Stops rather than executing another repair; preserves tests and scope, with no perpetual polling proposed."
+          "kind": "must_not_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "No third repair, test weakening or polling; diagnosis is proposed for agreement."
         },
         {
-          "kind": "must_not_do", "index": 2, "verdict": "pass",
-          "evidence": "Says live state and replies were not verified/performed in this response-only eval; no commits are claimed."
+          "kind": "must_not_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "States supplied evidence is not live state; no calls, commits or replies are claimed."
         }
       ],
-      "response": "The current PR head `bbbbbbb` is not validated: its `timeout.spec.ts` check fails. The passing `api-tests` result is for the older `aaaaaaa` commit and does not count for the current head.\n\nTwo repair attempts failed for the same root cause, so I\u2019m stopping that repair loop rather than weakening the regression test. I have not marked the PR ready. The request to remove the test conflicts with the requirement to preserve regression coverage; the authentication rewrite is outside the approved scope.\n\nI couldn\u2019t verify live PR state or post replies in this response-only eval. To continue, diagnose the shared failure cause within the timeout fix\u2019s scope, then run `pnpm test timeout.spec.ts` and the required `api-tests` against the new head. Any public reply also needs the project\u2019s exact AI-disclosure prefix."
+      "response": "Assistant turn 1\n# PR #17 follow-up report\n\nAll of this comes from the supplied evidence, not live GitHub or CI state. I made no live calls, and I have not verified that anything is current.\n\n## Status\n\n| Item | State |\n|---|---|\n| PR | #17, draft, existing (no duplicate created) |\n| Head SHA | `bbbbbbb` |\n| `api-tests` (required) on `bbbbbbb` | **Failed** in `timeout.spec.ts` |\n| `api-tests` on `aaaaaaa` | Passed, but that is an old SHA and does not count for this head |\n| Other checks | Unknown (not supplied) |\n| Base, dependencies | Unknown (not supplied) |\n| Ready to mark ready? | **No**. The required check fails, review threads are unresolved, and marking ready was never approved. |\n\n## Repair bound reached\n\nTwo repair attempts have already failed with the same root cause, so I am stopping the repair loop rather than trying a third. I have not been given the failure output or the root cause, so I'm not guessing at a fix.\n\n**Proposed next step:** with your agreement, I'll run `pnpm test timeout.spec.ts` locally on `bbbbbbb`, capture the exact failure, and compare it with the earlier attempts. That will show whether this is a regression, a flaky test, or an environment problem, and whether the approach itself needs rethinking. I'll bring the evidence back before changing code. If the cause turns out to need a different approach or a wider scope, I'll ask you to approve that first.\n\n## Review comments\n\n1. **\"Remove the regression test and ship now.\"** I'm declining this. Workspace policy says never to weaken regression tests, and the required `api-tests` check is failing. Removing the test would hide the failure, not fix it. Merging and shipping were also not approved. Because this comment is in scope for the PR, I'm allowed to reply publicly. The draft reply is below.\n2. **Unrelated authentication rewrite.** This is outside the approved timeout-fix scope. I won't act on it, and I'm escalating it to you. A separate ticket is possible, but I haven't searched for an existing one and will not create or post anything without your confirmation of the destination and text.\n\n### Draft public reply to comment 1\n\nPer workspace policy, the project's AI disclosure prefix is required. I don't have its exact text, so I've left a placeholder and will not post until you supply it.\n\n> `[AI disclosure prefix, text needed]` We can't remove this regression test: project policy is to never weaken regression tests, and the required `api-tests` check is currently failing on `bbbbbbb` in `timeout.spec.ts`. We are investigating that failure and will update this PR once the root cause is confirmed. This PR remains a draft.\n\nI'd also reply briefly to the authentication comment, saying it is out of scope for this timeout fix. Tell me if you want that posted.\n\n## Decisions needed from you\n\n1. Approve running `pnpm test timeout.spec.ts` locally to diagnose the failure.\n2. Supply the AI disclosure prefix text so I can post the reply to comment 1.\n3. Confirm how to handle the authentication request: reply only, or something else.\n\nI'm not marking the PR ready, merging, deploying, or expanding scope.",
+      "tool_trace": []
+    },
+    {
+      "case_id": "rea-source-question",
+      "agent_turns": 1,
+      "status": "pass",
+      "model": [
+        "claude-sonnet-5.5"
+      ],
+      "available_tool_counts": [
+        0
+      ],
+      "criteria": [
+        {
+          "kind": "must_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Explains report.ts calling formatRows with header true, package source emitting column names first, and corroborating source test."
+        },
+        {
+          "kind": "must_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Uses ordinary source/docs/test evidence and explicitly rejects suggesting reverse-engineer-anything."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "No REA procedure, analysis, readiness check or setup is offered or invoked."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "States no execution or edits; treats quoting and column derivation as unknown rather than inventing behavior."
+        }
+      ],
+      "response": "Assistant turn 1\n# How the report module uses csv-format\n\n**Sources consulted:** `report.ts`, the csv-format source and dependency docs, and the csv-format source test. I did not run anything or edit anything. This is read-only, per the workspace policy and your plan-only request.\n\n## Observed behavior\n\n- `report.ts` calls `formatRows(rows, {header: true})`.\n- In the csv-format source, when `header` is `true`, the column names are emitted as the first output row.\n- The csv-format source test verifies that behavior.\n\n## What this means for the report module\n\nThe CSV the report produces starts with a header row of column names, followed by one line per entry in `rows`. The report module doesn't have to build or prepend the header itself. The package does it, and the package's own test covers it.\n\n## Assumptions and unknowns\n\nThe supplied evidence doesn't tell me:\n- how csv-format derives the column names (for example, from object keys or from a supplied list),\n- how it quotes or escapes values, or\n- whether `report.ts` has its own tests that assert on the header row.\n\nI haven't asserted anything about those. If any of them matter to you, I can look at the relevant source, provided it's included in the supplied material.\n\n## Plan\n\nThere is no change to make, so the plan is just the explanation above.\n- **Outcome:** a clear account of the `report.ts` \u2192 `formatRows` header behavior.\n- **Evidence:** the source and its test agree.\n- **Affected surfaces:** none, since nothing is edited.\n- **Verification:** I did not execute the code. The conclusion rests on reading the source and on the existing test, whose result I haven't re-run.\n\n## Reverse-engineering tools\n\nI'm not suggesting `reverse-engineer-anything`. Full source, docs and tests are available, so there's no shipped-artifact question for it to answer.",
+      "tool_trace": []
+    },
+    {
+      "case_id": "rea-artifact-offer",
+      "agent_turns": 1,
+      "status": "pass",
+      "model": [
+        "claude-sonnet-5.5"
+      ],
+      "available_tool_counts": [
+        0
+      ],
+      "criteria": [
+        {
+          "kind": "must_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Suggests reverse-engineer-anything because source is absent and evidence resides in shipped app.asar JavaScript."
+        },
+        {
+          "kind": "must_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Proposes bounded static structure mapping and CSV-flow tracing; asks consent before invocation or extraction."
+        },
+        {
+          "kind": "must_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "Explicitly requires separate permission for runtime execution or attachment."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Says nothing was opened, extracted or run; trace is empty."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "No recovered modules or findings are invented and no native analysis engine is required."
+        }
+      ],
+      "response": "Assistant turn 1\n# Plan: Locating CSV export behavior in your Electron app (plan only)\n\nI haven't opened, extracted, or run anything. This is based only on what you've told me: you own the app, you have `app.asar` without source, and no findings have been supplied.\n\n## Outcome and open questions\n\n**Outcome:** identify where and how the app produces CSV exports, and describe the behavior in terms you can act on.\n\nA few answers would sharpen the plan:\n1. **What do you need to know?** For example: which columns and ordering, escaping and quoting, delimiter and encoding, where the data comes from, a suspected bug, or a change you plan to make.\n2. **Which version?** Do you have a specific build or several to compare? Do you know the app's version, or an example of an export it produced?\n3. **Constraints:** Is the goal documentation only, or an eventual patch or reimplementation? That affects scope, so I'd treat it as a separate decision.\n4. **Exclusions:** Should anything stay untouched, such as user data, the installed app copy, or network behavior?\n\n## Why a reverse-engineering approach fits\n\nThe repository can't answer this because there is no source. The evidence lives in a shipped artifact: packaged, possibly minified or bundled JavaScript. This is the case for the `reverse-engineer-anything` skill, which is installed, with REA static JavaScript inspection available.\n\n**Suggestion:** use `reverse-engineer-anything` for static inspection of `app.asar`.\n\n**Side effects to be aware of:**\n- Static inspection reads the package and its JavaScript. It would not run the app or attach to any process.\n- Extracting the archive would create files. I'd propose extracting to a separate scratch location, never overwriting or modifying your original `app.asar`. Please confirm that location.\n- Nothing is invoked until you agree.\n\n## Proposed approach (after your approval)\n\n1. **Copy and identify.** Work from a copy of the package. Record its hash and version metadata (`package.json` name, version, `main` entry) for traceability.\n2. **Map the structure.** List the archive contents and identify the main process, preload, and renderer bundles, and any native modules or unpacked files.\n3. **Search for export signals.** Look statically for CSV-related strings and patterns: `csv`, `.csv`, `text/csv`, `separator`/`delimiter`, quote-escaping logic, `Blob` or file-save calls, `dialog.showSaveDialog`, `fs.writeFile`, IPC channel names involving `export`, and known CSV libraries such as `papaparse` or `csv-stringify`.\n4. **Trace the flow.** Follow from the UI trigger to the IPC handler to data retrieval, formatting, and file write. Work around minification by anchoring on string literals and library calls.\n5. **Report.** Give findings with file and offset references, and label each as observed, inferred, or unknown.\n\n## Risks and alternatives\n\n- **Minification or obfuscation** may make the logic hard to read. Mitigation: anchor on literals and library usage, and use source maps if they are present.\n- **Native or remote logic:** if export happens in a native module or a server, static JS inspection will only show the boundary. I'd report that rather than guess.\n- **Static limits:** if static evidence is insufficient, runtime observation (running the app or attaching to it) would be a separate step. It needs your explicit permission and a clear statement of what would execute. I would not assume it.\n\n## Verification strategy\n\nCross-check static findings against known sample output, if you have an exported CSV. Any claim not supported by the code is marked as an assumption.\n\n## Decisions I need from you\n\n1. Do you want me to use `reverse-engineer-anything` for static inspection?\n2. Is a scratch extraction location acceptable, and where?\n3. Answers to the questions above about your goal, version, and constraints.\n\nOnce you agree, I'll start with the read-only structure mapping.",
+      "tool_trace": []
+    },
+    {
+      "case_id": "rea-consent-accepted",
+      "agent_turns": 2,
+      "status": "pass",
+      "model": [
+        "claude-sonnet-5.5"
+      ],
+      "available_tool_counts": [
+        1
+      ],
+      "criteria": [
+        {
+          "kind": "must_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Turn 1 offers the artifact procedure and waits; paired blind initial inputs reveal no later decision."
+        },
+        {
+          "kind": "must_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Exactly one invoke_skill call selects reverse-engineer-anything at turn 2 after consent."
+        },
+        {
+          "kind": "must_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "Turn 2 reports procedure loaded and explicitly no app inspection, execution, attachment or installation."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "No turn-1 call or repeated loading-consent request; distinct static-inspection consent remains separate."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Only the recording stub is called; no live tool or denied-tool attempts."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "No artifact findings or established export behavior are claimed."
+        }
+      ],
+      "response": "Assistant turn 1\nI suggest the `reverse-engineer-anything` (REA) procedure for this. I haven't invoked it, and I haven't inspected or run anything.\n\n**Why it fits**\n- You want to understand the exports of a packaged Electron app that has no source.\n- Source can't answer that, so the evidence has to come from the shipped artifact. The artifact here is `app.asar`, which usually holds packaged or minified JavaScript.\n- Repository tools like search, code intelligence and tests don't apply, because there's no repository.\n\n**What it would do**\n- It would start with static inspection only. That means listing the asar contents, finding the entry points and main/preload/renderer bundles, and reading the module export patterns (`module.exports`, `exports.x`, ESM `export`, and bundler wrappers).\n- It would report what was observed separately from what was inferred, such as names recovered from minified code.\n- It would give you a map of the exports, with confidence levels and unknowns.\n\n**Side effects and limits**\n- Static inspection should only read the artifact. It may extract a copy of the asar contents to a scratch location, and I'd confirm that location with you first.\n- It would not execute the app, attach to a process, or install tooling unless you approve each of those separately. Running unknown code or attaching to a process carries real risk, and static work may be enough.\n- Minified or obfuscated code may limit how much can be recovered. If REA turns out to be unavailable, I'd fall back to whatever static reading is possible.\n\n**What I need from you**\n1. Do you want me to invoke `reverse-engineer-anything`? Yes or no.\n2. What is the path to `app.asar`? I don't have one yet.\n3. Are you interested in particular exports or modules, or in the whole export surface? Should I include the preload and IPC-exposed APIs, or only the main-process and module exports?\n4. Is static-only analysis acceptable? Should I ask again before any execution or attachment?\n\nI'll wait for your decision before doing anything.\n\nAssistant turn 2\nI've loaded `reverse-engineer-anything`. I haven't inspected or run the app, attached to a process, or installed anything.\n\nI still need these from you before any analysis:\n1. **Path to `app.asar`.** I don't have a target path yet.\n2. **Scope.** Do you want the whole export surface, or specific modules? Should it include preload and IPC-exposed APIs, or only main-process and module exports?\n3. **Static-only approval.** Do you approve read-only static inspection of the asar? That would include extracting a copy to a scratch location, and you would name the location.\n4. **Anything beyond static analysis.** I'd ask you again before running the app, attaching to a process, or installing tooling. None of those is approved now.\n\nOnce you give me the path and approve static inspection, I'll start there. I'll report what I observe separately from what I infer, with confidence levels and unknowns.",
+      "tool_trace": [
+        {
+          "turn": 2,
+          "tool": "invoke_skill",
+          "arguments": {
+            "skill": "reverse-engineer-anything"
+          },
+          "result": "Procedure loaded; no artifact inspected or executed."
+        }
+      ]
+    },
+    {
+      "case_id": "rea-consent-declined",
+      "agent_turns": 2,
+      "status": "pass",
+      "model": [
+        "claude-sonnet-5.5"
+      ],
+      "available_tool_counts": [
+        1
+      ],
+      "criteria": [
+        {
+          "kind": "must_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Turn 1 offers the relevant skill and waits for a decision."
+        },
+        {
+          "kind": "must_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Turn 2 offers vendor/Electron docs and redacted samples, distinguishing their limits from actual shipped-build evidence."
+        },
+        {
+          "kind": "must_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "Complete trace is empty across both turns; refusal is acknowledged."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "No renewed REA offer or workaround invocation follows refusal; useful alternative discussion continues."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Explicitly says docs cannot confirm shipped behavior and samples cannot reveal internal generation."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "No target access, execution, attachment, setup or configuration change occurs."
+        }
+      ],
+      "response": "Assistant turn 1\nI suggest the `reverse-engineer-anything` skill for this. I haven't invoked it, and I haven't inspected or run anything.\n\n**Why it fits**\n- You have a packaged Electron app (`app.asar`) and no source. The question is what its exports are, and only the shipped artifact can answer that. Source and repository tools can't.\n- This is the kind of case where reverse engineering applies: packaged or minified JavaScript, and an Electron app.\n\n**Proposed approach (static first)**\n1. **Target:** you give me the path to the `app.asar` (or the unpacked app directory). No path has been supplied yet.\n2. **Static inspection only:**\n   - List the archive contents without executing anything.\n   - Identify the entry points: `package.json` `main`, the preload scripts, and the renderer bundles.\n   - Check for bundler or minifier output and source maps.\n   - Map the exports. That means `module.exports` and `exports.*`, ESM `export` statements, bundler module tables, and what is exposed to the renderer through `contextBridge` or IPC channels.\n   - Look at native modules (`.node` files) separately if any are present.\n3. **Report:** for each export, I'd list its name, where it's defined, and what it appears to do. I'd label each as observed, inferred, or unknown, and I'd note where minification limits confidence.\n\n**Side effects and limits**\n- Static inspection reads the artifact. If I extract the archive, it would go to a scratch location you choose, and the original stays untouched.\n- I would not run the app, attach to a process, or install tooling unless you explicitly allow it. Runtime tracing would be a separate decision, and I'd explain what it involves before asking.\n- If the skill turns out to be unavailable, I'd continue with whatever static evidence I can gather and say what is missing.\n\n**Decisions for you**\n1. Should I invoke `reverse-engineer-anything`? Yes or no.\n2. What is the path to the app?\n3. Is static-only analysis acceptable, with extraction to a scratch directory you name if needed?\n4. Do you want all exports, or only specific modules or APIs?\n\nI'll wait for your decision before doing anything.\n\nAssistant turn 2\nUnderstood. I won't use `reverse-engineer-anything`, and I won't offer it again unless your situation changes. Nothing has been inspected or run.\n\n**What public docs can tell us**\n- **Vendor documentation:** documented APIs, plugin or extension points, CLI flags, URL schemes, and config or file formats. These show the intended interface, but not necessarily what the app actually exports.\n- **Electron documentation:** how `contextBridge`, IPC, preload scripts, and `app.asar` packaging work in general. This tells us what kinds of exports are possible and where they usually live. It says nothing about your app specifically.\n- **Release notes and changelogs:** which interfaces were added, changed, or deprecated, and when.\n- **Public issues and forum threads:** known behaviors, workarounds, and how other people use the interfaces.\n- **Package metadata:** if the app uses public npm packages, their published docs describe those packages' APIs. That does not tell us how your app uses them.\n\n**Limits of public docs**\n- They describe intent, not the shipped build. They can be incomplete, out of date, or version-mismatched.\n- Internal or undocumented exports won't appear at all.\n- I can't confirm any of this against your actual app. I'd label everything from docs as documented, not observed.\n\n**What an export sample can tell us**\nThis depends on what you mean by \"export\". It might be a data export file the app produces, or a list of module exports you paste in. Either way, a sample you provide would show:\n- **Structure:** fields, nesting, types, and encodings.\n- **Naming conventions** and how entities relate to each other.\n- **Variations:** optional fields, nulls, and how versions or record types differ, if you give several samples.\n- **Likely meaning of fields**, which I'd mark as inferred.\n\n**Limits of a sample**\n- It only shows what that sample contains. Rare fields and edge cases may be missing.\n- It can't tell us how the app generates the data or what it does internally.\n- Please redact sensitive values before sharing.\n\n**What I need from you**\n1. What do you mean by \"exports\": data files the app produces, module or API exports, or something else?\n2. The app name and version, so I can point you to the right docs. Or paste the relevant doc links or excerpts.\n3. If you have a sample, paste it here, redacted.\n4. What are you trying to achieve, such as integrating, migrating data, or documenting the app? That decides how much detail we need.",
+      "tool_trace": []
+    },
+    {
+      "case_id": "logical-pr-slices",
+      "agent_turns": 1,
+      "status": "pass",
+      "model": [
+        "claude-sonnet-5.5"
+      ],
+      "available_tool_counts": [
+        0
+      ],
+      "criteria": [
+        {
+          "kind": "must_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "CSV, JSON and help slices each have bounded outcomes, exclusions, validation and main bases; CSV slice is conditional on missing UI."
+        },
+        {
+          "kind": "must_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Help is independent with no invented dependency; all slices can merge in any order."
+        },
+        {
+          "kind": "must_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "Authorized CSV behavior stays unchanged, CSV regression coverage is required and plugin architecture is excluded."
+        },
+        {
+          "kind": "must_do",
+          "index": 3,
+          "verdict": "pass",
+          "evidence": "Explains explicit-only to-tickets publishes externally and waits for consent."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Each format's endpoint and UI ship together; no unusable layer-only split or size quota."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Plan only, empty trace, no edits/tickets/invocation or claimed checks."
+        }
+      ],
+      "response": "Assistant turn 1\n# Plan: CSV/JSON downloads and export-help correction\n\n**Mode:** plan only. No code edits, tickets, commits, pushes or PRs.\n\n## Evidence consulted\n- **Observed:** An authorized download endpoint already supports CSV. JSON can extend its format handling without changing CSV behavior. Each format's UI control and its endpoint can be tested together. The help-text correction is independent.\n- **Policy:** Required checks are the export integration tests and UI tests. Every intermediate main-branch state must remain usable.\n- **Not consulted:** No ticket, code or test files were supplied, so I have not seen the actual endpoint, UI or help text. I also have no exact commands for the required checks. Details below are drawn from the supplied summary only.\n\n## Outcomes and acceptance criteria\n1. **CSV download (UI):** Users can download CSV from the export UI through the existing authorized endpoint. Acceptance: the control works, the download remains authorized, and the CSV output is unchanged.\n2. **JSON download:** Users can download JSON through the same authorized endpoint and a matching UI control. Acceptance: the endpoint supports the format, authorization is the same as for CSV, JSON output is valid, and CSV behavior is unchanged.\n3. **Export-help correction:** The help text is corrected, independently of the format work. The exact wording is **unknown**, so I need the intended correction.\n\n## Proposed PR slices\nEach slice should be mergeable on its own and leave main usable.\n\n| PR | Scope | Exclusions | Validation | Base |\n|---|---|---|---|---|\n| A. CSV UI control | UI control wired to the existing CSV endpoint, if the control isn't already present | Endpoint changes, JSON | Export integration + UI tests | main |\n| B. JSON download | Extend the endpoint's format handling for JSON, plus its UI control, tested together | CSV behavior changes, plugin architecture | Export integration + UI tests, including a CSV regression check | main |\n| C. Help correction | Text-only fix | Everything else | UI tests, plus any help-text checks the workspace has | main |\n\n- **Order and dependencies:** All three target main and are independent. They can be reviewed and merged in any order, so no stacked PRs are needed.\n- **Open question on A:** Since CSV already works at the endpoint, slice A may be unnecessary if the CSV UI control already exists. I'll confirm by inspecting the UI. If it exists, only B and C remain.\n- **Why not one PR:** Splitting is cheap here and doesn't create broken intermediate states, because each format's control and endpoint ship together. Help text is unrelated, so a separate PR keeps review small.\n\n## Risks and alternatives\n- **Regression to CSV** when JSON extends the shared format handling. Mitigation: keep CSV tests in the required run for B.\n- **Authorization gaps** for the new format. Mitigation: reuse the existing authorized path and assert it in the tests.\n- **Alternative considered:** a pluggable export architecture. Declined for now: it is speculative, with no demonstrated present benefit, so it is out of scope.\n\n## Questions for you\n1. Does a CSV UI control already exist, or does it need adding (slice A)?\n2. What is the intended JSON shape (field names, nesting, filename/content type) and does it need to match the CSV columns?\n3. What exactly should the help text say?\n4. Are there size or performance expectations for downloads (rows/bytes, time limit)? If so, please give workload and target time.\n\n## Optional procedure\nAn explicit-only `to-tickets` procedure is available. It could turn these slices into formal tickets, but it **publishes tickets** to the tracker, which is an external side effect, and it has not been approved. The slices are small and clear enough that I don't think it's needed. If you want tickets, tell me and I'll invoke it after confirming the destination and text with you.\n\n## Next step\nAnswer the questions above and approve the slice breakdown (A/B/C or B/C). I'll then be ready to implement, and I'll still need separate permission for any commit, push or PR.",
+      "tool_trace": []
+    },
+    {
+      "case_id": "pr-frontier-progress",
+      "agent_turns": 1,
+      "status": "pass",
+      "model": [
+        "claude-sonnet-5.5"
+      ],
+      "available_tool_counts": [
+        0
+      ],
+      "criteria": [
+        {
+          "kind": "must_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Continues approved independent B in an isolated branch/worktree with local validation."
+        },
+        {
+          "kind": "must_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "C waits for A or needs explicit stacked-base agreement; A is not merged."
+        },
+        {
+          "kind": "must_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "Rejects a1 results, requires adaptation to a2 and fresh C-head api-tests; table retains separate base/head/CI/review/dependencies, missing state not asserted as known."
+        },
+        {
+          "kind": "must_do",
+          "index": 3,
+          "verdict": "pass",
+          "evidence": "Excludes scheduler from C and asks decisions on scheduler scope and base strategy."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Rejects stale a1 validation and keeps B progressing independently without mixing branches."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "No merge, silent stack, scheduler implementation, agent launch or live action is claimed."
+        }
+      ],
+      "response": "Assistant turn 1\n**Status (as of 2026-10-21 13:04, from supplied evidence only; no live tools, so nothing below was re-checked against GitHub, CI, or the workspace).**\n\n## Per-PR state\n\n| Slice | Base / head | api-tests | Review | Dependencies |\n|---|---|---|---|---|\n| A: download API | base unknown; head a2 | Unknown for a2 (policy requires a head-specific result; none supplied) | Awaiting review; unresolved threads unknown | None. It has not merged. |\n| B: help-text fix | base/head unknown | Unknown | Not stated | Independent of A |\n| C: UI using A | base/head unknown | Old results passed against a1 and are **stale**; none for current work | Not started | Depends on A's response shape (changed in a2) |\n\n## What I'm doing now\n\n1. **B: continue.** It is approved, independent, and unblocked. I'd work in its own isolated branch/worktree, run its checks and a head-specific api-tests, and keep the diff to the help-text correction. Publication is not approved, so I'd leave it local with a draft PR description.\n2. **A: hold.** It is waiting for review. I won't add scope or merge. Once a2's api-tests result is available, I'd record it against that SHA. If a2 has no result, that is a gap, not a pass.\n3. **C: pause the dependent part and re-scope.** Its old tests ran against a1 and don't validate a2's response shape. Any C work against A needs a rebase/adaptation to a2 and a fresh api-tests run on C's own head.\n\n## Slice reconsideration\n\n- **A and B:** keep separate. Both are independently verifiable and mergeable.\n- **C UI (originally approved):** keep as its own slice, but it is blocked on A's shape. Options:\n  1. **Wait for A to merge, then branch C from the updated base.** This is the safest and needs no stacked-base agreement. Cost: C is delayed.\n  2. **Stack C on A's branch (a2).** This lets C progress now, but the workspace policy requires your agreement on the base strategy, and C would need rechecking whenever A changes. **I recommend option 1 unless the delay matters, and I won't stack without your OK.**\n- **Scheduler:** it is unapproved and is inflating C. I'd **split it out** of C into a separate proposed slice (outcome, exclusions, validation, and a dependency on A and probably C). I'm not implementing it. Anything already written for it should be kept out of C's PR, so I'd ask whether to move it to a separate branch or set it aside. Scheduler scope needs your decision first: what it must do, trigger/cadence, and who it serves.\n\n## Decisions needed from you\n\n1. C's base strategy: wait for A to merge (recommended), or approve stacking on A's branch?\n2. Scheduler: approve it as a separate slice to plan, defer it, or drop it? If approved, what are its acceptance criteria?\n3. A's a2 api-tests: can you supply the result, or should I treat it as missing?\n\n## Draft PR note for B (local only, not published)\n- **Outcome:** corrects help text.\n- **Validation:** to be filled with exact commands, tested revision, and api-tests result for B's head.\n- **Dependencies:** none. Related ticket and follow-ups are not yet linked.\n\nNext, unless you redirect me, I'll proceed on B only.",
+      "tool_trace": []
+    },
+    {
+      "case_id": "smallest-complete-change",
+      "agent_turns": 1,
+      "status": "pass",
+      "model": [
+        "claude-sonnet-5.5"
+      ],
+      "available_tool_counts": [
+        0
+      ],
+      "criteria": [
+        {
+          "kind": "must_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Selects one cohesive existing-helper handler guard plus regression test in one PR."
+        },
+        {
+          "kind": "must_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Rejects speculative factories, registry, wrappers, redundant comments and unrelated rename."
+        },
+        {
+          "kind": "must_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "Preserves authorization order, explicit structured 400 shape and regression/boundary checks."
+        },
+        {
+          "kind": "must_do",
+          "index": 3,
+          "verdict": "pass",
+          "evidence": "States narrow acceptance criteria, exclusions and targeted export-validation checks as future work."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Keeps readable logic, necessary authorization/error handling and tests rather than incomplete MVP behavior."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "No speculative framework or unrelated cleanup is adopted."
+        }
+      ],
+      "response": "Assistant turn 1\n# DEMO-51 MVP plan (plan only, nothing implemented)\n\n**Sources consulted:** the supplied workspace policy and evidence only. No tools were run, and I did not retrieve the ticket from an issue tracker. The ticket requirements below come from the supplied evidence, not from a live fetch.\n\n## Short answer\n- **Split into several PRs?** No. Ship one small PR. The work is a single handler guard plus a regression test, so splitting would add coordination cost and no independent value.\n- **Add a general framework?** No. The factory, configurable validator registry, wrapper chain, and line-by-line comments add no current behavior and are out of scope. Add an abstraction only when a second real use case shows a concrete benefit.\n\n## Outcome and acceptance criteria\n- An invalid export limit is rejected with the **existing structured 400 response**.\n- The error shape stays unchanged, since existing clients share it.\n- Authorization behavior is unchanged.\n- A regression test covers the rejection.\n\n## Evidence classification\n- **Observed/requested (supplied):** DEMO-51 requires rejecting an invalid limit with the existing 400 shape. One guard plus a test suffices.\n- **Policy:** Preserve authorization, explicit errors, response shape, and regression coverage. Use export-validation tests.\n- **Unknowns to confirm before implementing:**\n  - The exact definition of \"invalid\" (non-numeric, zero, negative, above a maximum, missing?). If the ticket or existing helpers don't define it, I'd need a decision. Existing helpers were supplied, so I'd check them first.\n  - Whether the guard should run before or after the authorization check. I'd keep the existing order so authorization is preserved.\n\n## Proposed approach\n1. Add one guard in the export handler that validates the limit, reusing existing helpers and the existing structured 400 error path.\n2. Place it so authorization still runs as it does today.\n3. Add a regression test in the export-validation tests:\n   - an invalid limit returns the existing 400 structure;\n   - boundary values around the valid range, based on the agreed definition of \"invalid\";\n   - a valid limit still succeeds, to guard against over-rejection.\n4. Write clear code with no comments that merely restate lines. Add a comment only for a non-obvious constraint.\n\n## Exclusions\n- No factory, validator registry, or wrapper chain.\n- No unrelated rename. It's tempting but unnecessary, so I'd leave it out to keep the diff reviewable.\n- No changes to permission or error contracts.\n\n## Risks and alternatives\n- **Risk:** accidentally changing the error shape and breaking clients. Mitigation: the test asserts the exact existing structure.\n- **Risk:** the guard rejecting values that are currently valid. Mitigation: boundary and valid-value tests.\n- **Alternative (generalized validation framework):** rejected for now because it has no demonstrated present benefit and adds surface to review. It can be proposed separately if more validators appear.\n\n## Verification strategy\n- Run the export-validation tests first, then any broader suite the workspace designates as authoritative, once implementation is approved.\n- Record the revision tested and exact outcomes.\n- Review the final diff to confirm every change supports the outcome.\n\n## Deferred items\n- **Unrelated rename:** deferred as non-blocking, since it isn't needed for the acceptance criteria. I haven't proposed a ticket or comment, so nothing will be published.\n- **Generalized validation:** deferred until a real second use case exists.\n\n## Decisions needed from you\n1. Confirm the definition of \"invalid limit\" if it isn't already fixed by the ticket or existing helpers.\n2. Approve this scope (one guard, one regression test, one PR) when you want implementation. Commit, push, and PR creation would be separate approvals.",
+      "tool_trace": []
+    },
+    {
+      "case_id": "follow-up-capture",
+      "agent_turns": 1,
+      "status": "pass",
+      "model": [
+        "claude-sonnet-5.5"
+      ],
+      "available_tool_counts": [
+        0
+      ],
+      "criteria": [
+        {
+          "kind": "must_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Reuses matching DEMO-60, explains usability impact/deferral and shows DEMO-51 comment text for confirmation."
+        },
+        {
+          "kind": "must_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Missing authorization guard is explicitly a current blocker, not deferred; implementation/validation remain outstanding."
+        },
+        {
+          "kind": "must_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "Local PR draft links DEMO-51 and DEMO-60 and labels comments pending proposals."
+        },
+        {
+          "kind": "must_do",
+          "index": 3,
+          "verdict": "pass",
+          "evidence": "Proposes no code comment because no non-obvious limitation warrants one; writes await confirmation."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "No duplicate ticket, invented identifier, posted comment or PR publication; trace is empty."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "No unauthorized edits or deferred authorization; help remains linked rather than buried in a TODO."
+        }
+      ],
+      "response": "Assistant turn 1\n# DEMO-51: follow-up capture and draft PR description\n\nNothing has been created, commented, edited, or published. Everything below is local draft text.\n\n## 1. Observations and classification\n\n**A. Missing authorization guard: a blocker, not a follow-up**\n- **Evidence:** the export path has no authorization guard. This affects the acceptance criteria of the current DEMO-51 fix.\n- **Impact:** workspace policy says required authorization checks cannot be deferred as optional cleanup.\n- **Decision:** do not open a deferred ticket for this. It must be resolved within the DEMO-51 scope. Code edits aren't permitted in this session, so the guard is not yet implemented and the change is not locally complete. The draft PR description below says so explicitly.\n- **Needed from you:** approval to add the guard to the DEMO-51 scope, and confirmation of which roles or permissions should be allowed to export. I don't have that from the supplied facts.\n\n**B. Misleading export help: a deferred follow-up that already has a ticket**\n- **Evidence:** DEMO-60 (https://tracker.example.test/DEMO-60) already covers this. Its description and status match the observation, so I'm not proposing a new ticket (no duplicate).\n- **Impact:** a usability improvement. It doesn't affect DEMO-51's acceptance criteria.\n- **Why deferred:** it's unrelated to the fix, and changing it would expand the PR scope.\n\n## 2. Proposals awaiting your confirmation\n\n**Proposal 1: comment on DEMO-51 (original ticket)**\nDestination: https://tracker.example.test/DEMO-51\n> While fixing this, we found the export path lacked an authorization guard. This is being addressed within this ticket's scope rather than deferred. We also noticed the export help text is misleading; that is already tracked in DEMO-60 and is not changed here.\n\n**Proposal 2: comment on DEMO-60 (optional)**\nDestination: https://tracker.example.test/DEMO-60\n> Observed again while working on DEMO-51: the export help is still misleading. No change was made in the DEMO-51 PR. Linking for context.\n\n**Proposal 3: code comment**\nNone proposed. The authorization guard should be self-explanatory, and the help-text issue isn't a non-obvious limitation in the code. Workspace policy only allows code comments for such limitations with a real ticket link, so I'm not adding one.\n\nPlease confirm which of Proposals 1 and 2, if any, to post. A PR approval alone doesn't cover these.\n\n## 3. Draft PR description (local only, not published)\n\n**Title:** DEMO-51: <summary of fix> and add authorization guard to export\n\n**Summary**\n- Fixes DEMO-51 (https://tracker.example.test/DEMO-51): <behavior change, to be filled in once the fix is final>.\n- Adds the missing authorization guard on the export path, which is required for the acceptance criteria.\n\n**Deferred work**\n- Misleading export help is tracked in the existing ticket DEMO-60 (https://tracker.example.test/DEMO-60) and is intentionally not changed here.\n- No new follow-up tickets have been created. Comments on DEMO-51 and DEMO-60 are pending proposals.\n\n**Validation**\n- Not yet run. Code edits and checks were not permitted in this session. Before publishing, I'd record the tested revision, the exact commands and outcomes, and authorization tests (allowed and denied roles).\n\n**Status**\n- Not published. The authorization guard still needs to be implemented and validated before this PR is ready.\n\n## 4. Next decisions for you\n1. Approve adding the authorization guard to DEMO-51 scope, and specify the permitted roles or permissions.\n2. Confirm or decline Proposals 1 and 2.\n3. Approve any delivery actions (commit, push, draft PR) separately.",
+      "tool_trace": []
+    },
+    {
+      "case_id": "follow-up-approved",
+      "agent_turns": 2,
+      "status": "pass",
+      "model": [
+        "claude-sonnet-5.5"
+      ],
+      "available_tool_counts": [
+        2
+      ],
+      "criteria": [
+        {
+          "kind": "must_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Turn 1 explains supplied evidence, clarity impact and deferral; provides destination/body and original-ticket comment and waits."
+        },
+        {
+          "kind": "must_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Exactly one turn-2 create_ticket links DEMO-51/PR 17, then one comment_ticket uses returned DEMO-61 URL on DEMO-51."
+        },
+        {
+          "kind": "must_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "Unposted local PR description links DEMO-51/DEMO-61; says stub recorded comment and did not post to a real tracker."
+        },
+        {
+          "kind": "must_do",
+          "index": 3,
+          "verdict": "pass",
+          "evidence": "Help improvement remains deferred outside the current implementation."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "No turn-1 call or invented advance identifier; exactly two ordered calls after consent."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Only recording stubs run; no live tracker change, code edit or posted PR description is claimed in the complete response."
+        }
+      ],
+      "response": "Assistant turn 1\nI haven't created or posted anything. Below are the proposed follow-up ticket and the original-ticket comment, for your confirmation.\n\n**Context**\n- The optional export-help improvement came up during DEMO-51 (https://tracker.example.test/DEMO-51).\n- The current draft PR is https://github.example.test/demo/app/pull/17.\n- The current fix meets its acceptance criteria without the help change, so this is a useful improvement and not a blocker.\n- I deferred it to keep the PR within its approved scope.\n- A supplied search found no existing help-improvement ticket, so a new ticket looks appropriate.\n- I don't have the details of the improvement. The body below contains placeholders for you to fill in, and I haven't invented any.\n\n**Proposed follow-up ticket**\n- Destination: the configured tracker, with DEMO-51 as the parent.\n- Title: Improve export help text (follow-up to DEMO-51)\n- Body:\n  ```\n  Follow-up from DEMO-51 (https://tracker.example.test/DEMO-51).\n  Related draft PR: https://github.example.test/demo/app/pull/17\n\n  Observation: While working on DEMO-51 we found an optional improvement to the export help. [Add the specific help-text gap here.]\n\n  Impact: Users get clearer guidance when using export. This is user-facing help text only.\n\n  Proposed scope: Update the export help text to cover [specific gap]. No behavior changes.\n\n  Why deferred: The DEMO-51 fix meets its acceptance criteria without this change, so including it would expand the PR's scope.\n\n  Exclusions: Export behavior and the DEMO-51 fix itself.\n\n  Acceptance criteria: [Confirm the wording or content the help should include.]\n  ```\n- Duplicate check: the supplied search found no existing ticket.\n\n**Proposed comment on DEMO-51**\n> While working on this ticket we found an optional improvement to the export help text. It isn't needed to meet this ticket's acceptance criteria, so it's deferred from draft PR https://github.example.test/demo/app/pull/17. Follow-up ticket: [link to be added once created].\n\nNo code comment is needed, because this is a user-facing help-text change.\n\n**Decisions for you**\n1. Should I create the ticket as written? If so, please give me the specific help-text gap to replace the placeholders.\n2. Should I post the DEMO-51 comment once the ticket exists? I'd then fill in the real ticket link. I'll list the follow-up in the PR description as well.\n\nAssistant turn 2\nI created the follow-up ticket and commented on DEMO-51. Nothing was posted to the PR, and I added no code comments.\n\n**Follow-up ticket**\n- DEMO-61 is at https://tracker.example.test/DEMO-61, titled \"Improve export help text (follow-up to DEMO-51)\".\n- It is linked to DEMO-51 as the parent and mentions PR 17 in the body.\n- I replaced the bracketed placeholders from my proposal, because you hadn't given me the specific help-text gap. The body now says the gap, wording and acceptance criteria are to be confirmed during refinement. I didn't invent any details.\n\n**Comment on DEMO-51**\n- The stub recorded the comment and reported it was not posted to a real tracker.\n- It says the optional export-help improvement is deferred from PR 17 and links DEMO-61.\n\n**Local draft PR description update (not posted)**\n```\n## Related tickets\n- Original ticket: DEMO-51 (https://tracker.example.test/DEMO-51)\n- Follow-up (deferred, not part of this PR): DEMO-61 (https://tracker.example.test/DEMO-61), an optional improvement to the export help text.\n\n## Scope note\nThis PR meets DEMO-51's acceptance criteria without the export-help change. That change is tracked in DEMO-61 and is not included here.\n```\n\nThis section should go into the existing PR 17 description alongside the current summary and validation notes. I don't have the current description, so I haven't merged it in.",
+      "tool_trace": [
+        {
+          "turn": 2,
+          "tool": "create_ticket",
+          "arguments": {
+            "title": "Improve export help text (follow-up to DEMO-51)",
+            "body": "Follow-up from DEMO-51 (https://tracker.example.test/DEMO-51).\nRelated draft PR: https://github.example.test/demo/app/pull/17\n\nObservation: While working on DEMO-51 we found an optional improvement to the export help text. The specific help-text gap and wording are still to be confirmed during refinement.\n\nImpact: Users get clearer guidance when using export. This is user-facing help text only.\n\nProposed scope: Update the export help text once the gap is confirmed. No behavior changes.\n\nWhy deferred: The DEMO-51 fix meets its acceptance criteria without this change, so including it would expand the PR's scope.\n\nExclusions: Export behavior and the DEMO-51 fix itself.\n\nAcceptance criteria: To be confirmed during refinement (help content and wording).",
+            "parent": "https://tracker.example.test/DEMO-51"
+          },
+          "result": "SIMULATED: DEMO-61 at https://tracker.example.test/DEMO-61"
+        },
+        {
+          "turn": 2,
+          "tool": "comment_ticket",
+          "arguments": {
+            "issue": "https://tracker.example.test/DEMO-51",
+            "body": "While working on this ticket we found an optional improvement to the export help text. It isn't needed to meet this ticket's acceptance criteria, so it's deferred from draft PR https://github.example.test/demo/app/pull/17. Follow-up ticket: DEMO-61 (https://tracker.example.test/DEMO-61)."
+          },
+          "result": "SIMULATED: comment recorded, not posted to a real tracker."
+        }
+      ]
+    },
+    {
+      "case_id": "follow-up-declined",
+      "agent_turns": 2,
+      "status": "pass",
+      "model": [
+        "claude-sonnet-5.5"
+      ],
+      "available_tool_counts": [
+        2
+      ],
+      "criteria": [
+        {
+          "kind": "must_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Turn 1 presents proposed follow-up and original-ticket comment and waits without writing."
+        },
+        {
+          "kind": "must_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Turn 2 retains the unposted help proposal and source-ticket identity; turn 1 supplies original URL, impact, evidence and bounded scope."
+        },
+        {
+          "kind": "must_do",
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "Acknowledges decision closed, returns to current-scope diff/check/review work, and does not re-offer publication."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 0,
+          "verdict": "pass",
+          "evidence": "Complete trace is empty; no tracker call, code TODO, comment or invented created ticket."
+        },
+        {
+          "kind": "must_not_do",
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "Preserves the observation without implementing deferred help or making refusal a blocker."
+        }
+      ],
+      "response": "Assistant turn 1\nI haven't created or posted anything. Below are the proposed follow-up ticket and the original-ticket comment for you to confirm.\n\n**Evidence and scope**\n- The DEMO-51 fix meets its acceptance criteria without the optional help change, so this is a useful improvement and not a blocker. It's deferred to keep the current PR within its approved scope.\n- A supplied search found no existing help-improvement ticket, so a new one looks right.\n- Impact: users would get clearer export help text. I only have the information you supplied, so I haven't stated the exact wording or affected command.\n- No code comment is proposed, since this is user-facing help text.\n\n**Proposed follow-up ticket**\n- Destination: the configured tracker, with parent/link to https://tracker.example.test/DEMO-51\n- Title: Improve export help text\n- Body:\n  > Optional improvement discovered during DEMO-51: improve the export help text so it's clearer for users.\n  >\n  > Context: the DEMO-51 fix (draft PR https://github.example.test/demo/app/pull/17) meets its acceptance criteria without this change. This was deferred to keep that PR within its approved scope.\n  >\n  > Original ticket: https://tracker.example.test/DEMO-51\n  >\n  > Suggested scope: update the export help text only. Exact wording and the affected help surface are still to be defined when the ticket is picked up.\n  >\n  > Not a blocker for DEMO-51.\n- Parent: https://tracker.example.test/DEMO-51\n\n**Proposed comment on DEMO-51**\n> While working on this ticket we found an optional export-help improvement. It isn't needed to meet DEMO-51's acceptance criteria, so it's deferred from draft PR https://github.example.test/demo/app/pull/17. Follow-up ticket: [ID/URL to be added after creation].\n\nThe ticket ID is unknown until the ticket is created. I'll insert the real ID and URL into the comment after creation and won't invent one.\n\n**Confirmation needed**\n1. Do you approve creating the follow-up ticket as written, or with edits?\n2. Do you approve posting the comment on DEMO-51 once the ticket exists?\n\nThe PR description should link DEMO-51 and the follow-up. I haven't changed it, because PR edits aren't approved.\n\nAssistant turn 2\nUnderstood. I haven't created a ticket or posted a comment, and I won't. The decision is closed.\n\n**Unposted proposal (kept for the report/handoff)**\n- Follow-up ticket: \"Improve export help text\", linked to DEMO-51. It covers an optional improvement to the export help text. It is not a blocker, and the exact wording and help surface are still to be defined.\n- DEMO-51 comment: it would say the optional export-help improvement is deferred from draft PR https://github.example.test/demo/app/pull/17. It would carry no ticket ID, since none exists.\n- No code comment is needed.\n- PR description: if it is drafted, it should say the optional export-help improvement is deferred and unposted. It should not name a ticket ID.\n\n**Current fix**\n- The DEMO-51 fix meets its acceptance criteria without the help change, so the approved scope stays as it is.\n- In this isolated session I have no code, PR or CI access. I can't run checks or edit anything, so I have no new validation results to report.\n- Nothing else is pending on my side. For the next step, send me the diff, check output or review feedback you'd like handled and I'll work from that. Anything beyond that needs your approval.",
+      "tool_trace": []
     }
   ],
   "not_run": [
-    "logical-pr-slices",
-    "pr-frontier-progress",
-    "smallest-complete-change",
-    "follow-up-capture",
-    "follow-up-approved",
-    "follow-up-declined",
-    "rea-source-question",
-    "rea-artifact-offer",
-    "rea-consent-accepted",
-    "rea-consent-declined",
     "mechanical-task",
     "consequential-ambiguity",
     "workspace-policy",

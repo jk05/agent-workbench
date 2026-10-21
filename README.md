@@ -1,5 +1,7 @@
 # Agent Workbench
 
+![Agent Workbench: reusable skills for AI coding agents](docs/images/agent-workbench.png)
+
 Reusable skills and small helpers for working with AI coding agents.
 **Copilot in VS Code's Agents window is the only supported target today.**
 
@@ -29,17 +31,28 @@ Skills + helper + checks           ~/.agents/skills/<selected-skill>/
 
 ## Use it
 
-1. From this repo, install a selected skill **only after approving activation**:
+Requires Python 3.9+ and Copilot in VS Code. No SDK or Node setup is needed
+to verify or install.
+
+1. Clone the repo and check readiness (no installation or AI calls):
+
+   ```sh
+   git clone https://github.com/jk05/agent-workbench.git
+   cd agent-workbench
+   python3 scripts/workbench.py verify engineering-workbench
+   ```
+
+   Expected: `required eval evidence is current and passing`.
+   Verification reads saved [evals](evals/README.md); it does not rerun them.
+
+2. Install **only after approving activation**:
 
    ```sh
    python3 scripts/workbench.py install engineering-workbench --activate
    ```
 
-   Installation also requires current, passing [evals](evals/README.md).
-   **This example is currently blocked by its recorded planning failure.**
-
-2. Open your project and start a fresh Copilot Agents session.
-3. Ask, for example:
+3. Open your project and start a fresh Copilot Agents session.
+4. Ask, for example:
 
    > Use engineering-workbench to investigate PE-1234. Plan only for now.
 

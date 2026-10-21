@@ -3,6 +3,7 @@
 import importlib.util
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -436,6 +437,16 @@ class CopilotInstallerTests(unittest.TestCase):
         self.assertFalse(self.state.exists())
         self.assertFalse(self.destination().exists())
 
+    def test_sdk_evidence_uses_the_same_freshness_gate(self):
+        result = json.loads(self.result_path().read_text())
+        result["execution_target"] = "Copilot Python SDK"
+        self.result_path().write_text(json.dumps(result))
+        workbench.verify_evals("example-one")
+        result.pop("inputs_sha256")
+        self.result_path().write_text(json.dumps(result))
+        with self.assertRaises(workbench.WorkbenchError):
+            workbench.verify_evals("example-one")
+
     def test_human_docs_and_other_skill_policy_do_not_invalidate_evidence(self):
         (self.root / "README.md").write_text("Human-facing prose change")
         self.policy["skills"]["example-two"]["purpose"] = "other skill change"
@@ -481,11 +492,11 @@ class HandoffAndCliTests(unittest.TestCase):
         self.home = self.root / "home"
         self.state = self.root / "state"
 
-    def run_cli(self, *arguments):
+    def run_cli(self, *arguments, script=SCRIPT):
         return subprocess.run(
             [
                 sys.executable,
-                str(SCRIPT),
+                str(script),
                 "--home",
                 str(self.home),
                 "--state-root",
@@ -514,16 +525,28 @@ class HandoffAndCliTests(unittest.TestCase):
         self.assertFalse(self.home.exists())
         self.assertFalse(self.state.exists())
 
-    def test_cli_blocks_current_failed_example_without_writes(self):
-        result = self.run_cli("install", "engineering-workbench", "--activate")
+    def test_cli_blocks_failed_evidence_without_writes(self):
+        repository = self.root / "repository"
+        for directory in ("scripts", "runtimes", ".agents/skills", "evals"):
+            shutil.copytree(SCRIPT.parents[1] / directory, repository / directory)
+        results_path = repository / "evals/results.json"
+        results = json.loads(results_path.read_text())
+        results["runs"][0]["status"] = "fail"
+        results_path.write_text(json.dumps(results))
+        script = repository / "scripts/workbench.py"
+        result = self.run_cli(
+            "install", "engineering-workbench", "--activate", script=script
+        )
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("ticket-planning: fail", result.stderr)
         self.assertFalse(self.home.exists())
         self.assertFalse(self.state.exists())
-        verify = self.run_cli("verify", "engineering-workbench")
+        verify = self.run_cli("verify", "engineering-workbench", script=script)
         self.assertNotEqual(verify.returncode, 0)
         self.assertIn("ticket-planning: fail", verify.stderr)
-        fingerprints = self.run_cli("eval-inputs", "engineering-workbench")
+        fingerprints = self.run_cli(
+            "eval-inputs", "engineering-workbench", script=script
+        )
         self.assertEqual(fingerprints.returncode, 0, fingerprints.stderr)
         self.assertEqual(
             set(json.loads(fingerprints.stdout)),

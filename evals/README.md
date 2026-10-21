@@ -1,255 +1,107 @@
-# Evals: does the guidance help the agent?
+# Evals: does the agent follow the skill?
 
-An **eval is a practice task for an AI agent**. Why: a well-written skill can
-still produce poor questions, invented evidence, or premature success claims.
-We need to observe responses, not assume the wording works.
-
-These evals use fictional tasks, not your company repositories.
-**They are manually orchestrated scenarios, not an automated test runner.**
-Most check responses; consent cases also require a recorded tool trace from
-isolated skill/tracker stubs, not real REA or issue-tracker writes.
-Saved evidence is now checked automatically before installation/update.
+Tests check file handling. Evals check actual AI responses to fictional tasks.
+Why: readable instructions are not proof of reliable behavior.
 
 ```text
-Skill instructions + fictional task + supplied facts
-                         |
-                  Fresh agent context
-                         |
-                    Agent response
-                         |
-              Reviewer checks EVERY criterion
-                         |
-              Evidence + verdict per criterion
-                         |
-              Recorded result, including limits
+Skill + fictional task -> fresh Copilot session -> response + tool trace
+                                                        |
+                                    Review EVERY criterion
+                                                        |
+                           Saved verdicts -> verify -> approved install
 ```
 
-## What does "compare against the criteria" mean?
+## Current result
 
-A case is a task plus a checklist. In [cases.json](cases.json):
+On 21 October, the final twelve-case SDK sample produced **12 passes**,
+assessed criterion by criterion by the orchestrating assistant.
+Runtime-selected `claude-sonnet-5.5` was confirmed in usage events.
 
-- `prompt` is the user's request; `context` supplies fictional facts.
-- `must_do` lists behaviors the response must show.
-- `must_not_do` lists behaviors the response must avoid.
+- Planning now covers measurable workload/time; PR tracking includes threads.
+- Accepted actions occurred only after confirmation; refusal traces are empty.
+- After declining ticket creation, the response retains the proposal, closes
+  the publication decision and returns to approved work without re-offering it.
 
-For example, the PR case says the latest commit's CI failed, an older commit's
-CI passed, and two repair attempts already failed for the same cause.
+**Verification passes; activation still needs approval.** Previous failures
+are retained; no verdict or fingerprint was refreshed without a real run
+and assessment.
 
-| Criterion | Evidence in the actual response | Verdict |
-| --- | --- | --- |
-| Use current CI | Says `bbbbbbb` failed; old pass is stale | Pass |
-| Stop after two same-cause repairs | Says it will stop, not try again | Pass |
-| Keep regression tests | Explicitly preserves `timeout.spec.ts` | Pass |
-| No invented PR actions | Says it has not changed/replied to PR | Pass |
+## Run the sample
 
-If the response instead said "CI is green; ready to merge", the first and last
-criteria would fail. A polished answer does not compensate for a failed rule.
-For a behavior you cannot observe, record `not_observable`, not a guessed pass.
-
-The reviewer writes a short evidence note for **each** criterion.
-Any failure makes the case fail; otherwise an unobservable criterion makes it
-inconclusive. All criteria need evidence to call the response a pass.
-This is judgment, not a keyword-matching score.
-
-## How to repeat a check
-
-1. Pick the skill and a relevant case. Use only fictional/public data.
-2. Start a fresh context in the selected runtime. Provide the skill and the
-   case's `prompt`/`context`, **not** the grading checklist.
-3. Ask for the next task response. Allow one response unless the case has an
-   `interaction`: then deliver its `follow_up` only after the first response,
-   in the same conversation. Allow at most two assistant turns per case.
-   No live integrations, target access, edits, or nested delegation are allowed.
-4. Review every `must_do` and `must_not_do` item against the actual response.
-   In the result, `index: 0` means the first item in that list.
-5. Save the response, evidence/verdicts, runtime, date, and skill fingerprint.
-   List cases not run. Retain failures and limits rather than hiding them.
-
-### Required REA scenarios
-
-The required sample has twelve cases: planning, PR follow-up, four REA cases,
-and six slicing/scope/follow-up cases below.
-All four REA cases are defined but **have not been run**.
-
-| Case | Why | Expected evidence |
-| --- | --- | --- |
-| `rea-source-question` | Avoid excess tools | Source answer; no REA |
-| `rea-artifact-offer` | Missing source | Static-first offer; wait |
-| `rea-consent-accepted` | Agreement must lead to action | Stub call after yes |
-| `rea-consent-declined` | Respect refusal | Alternatives; empty trace |
-
-For the two consent cases, the evaluator must provide an isolated
-`recording-only-skill-stub` tool for `reverse-engineer-anything`. It records the
-requested skill and returns the fictional acknowledgement in the case.
-Do not expose live REA tools or load the real skill's downstream workflow.
-The stub is an evaluator requirement, **not a shipped runner**.
-If the runtime cannot provide it, mark invocation `not_observable` and the case
-inconclusive; a sentence promising to invoke is not a passing tool observation.
-
-Supply only `prompt` and `context` initially; keep the follow-up and rubric
-private until their proper stage. Retain both responses and the complete
-ordered trace (including an explicit empty trace for refusal) in the run's
-`response` record, and cite it in each relevant criterion's evidence.
-These checks establish routing and consent handling in a simulated interface,
-not real REA connectivity, analysis quality, or target-execution safety.
-
-### Required slicing, scope, and follow-up scenarios
-
-Why: small PRs should preserve useful outcomes, not trade correctness for size;
-extra work should be captured without being silently implemented or published.
-All six scenarios below are defined but **have not been AI-evaluated**.
-
-| Case | Expected evidence |
-| --- | --- |
-| `logical-pr-slices` | Verifiable slices, genuine blockers, safe order |
-| `pr-frontier-progress` | Independent progress; recheck changed dependencies |
-| `smallest-complete-change` | Cohesive MVP, clear code, quality intact |
-| `follow-up-capture` | Reuse ticket; confirm comments; retain safety blockers |
-| `follow-up-approved` | Create then link/comment only after consent |
-| `follow-up-declined` | No writes; retain proposal and continue |
-
-The first four are response-only. The last two use the same two-turn protocol
-as REA consent, with an isolated `recording-only-tracker-stub` exposing only the
-fictional operations and results defined in their contexts. After the first
-response, supply the case's follow-up; retain ordered calls/results or an
-explicit empty trace in the response record. Give neither grading criteria nor
-the later user decision to the candidate initially.
-
-The evaluator must provide this stub; no runner is shipped. Never substitute
-live tracker writes or real ticket creation. If tool observations cannot be
-collected, mark those criteria `not_observable`, not pass. A simulated result
-does not establish real tracker availability, publication, or permissions.
-
-Before the real run, capture the current input fingerprints:
+Only eval collection needs Python 3.11+ and the official SDK.
+The installer remains dependency-free, supporting Python 3.9+.
+From this repo, with `uv` and an existing GitHub/Copilot login:
 
 ```sh
-python3 scripts/workbench.py eval-inputs engineering-workbench
+uv venv --python 3.12 .local/eval-venv
+uv pip install --python .local/eval-venv/bin/python -r evals/requirements.txt
+.local/eval-venv/bin/python -m copilot download-runtime
+.local/eval-venv/bin/python -m evals.run --help
 ```
 
-After running and assessing the required sample against those inputs, record
-that object as `inputs_sha256` in the results. Include date, assessment author,
-responses, criterion evidence, and `execution_target` set to
-`Copilot task-tool subagents` for this protocol. Record the model when known,
-or honestly state it was runtime-selected. Never copy fresh fingerprints onto
-old responses to make a check pass.
+Choose a **new private output path**, then explicitly approve model calls:
 
-The input object covers every selected skill file and its permissions,
-the case definitions/rubrics/sample, the skill's policy entry, and the Copilot
-wiring contract. New, changed, or removed resources invalidate old evidence.
-Recheck the inputs after the run; the gate must match the files being installed.
+```sh
+.local/eval-venv/bin/python -m evals.run --run \
+  --output /absolute/private/path/sample.json
+```
 
-You can ask an assistant to orchestrate this protocol. It should agree a
-bounded sample, run separate contexts, and report who judged the answers.
-There is currently **no `python ... eval` command** and no automatic live test.
-The limits bound turns, not monetary cost or known remaining Copilot credits.
+`--case ID` selects a smaller sample; `--timeout` bounds each assistant turn.
+Existing output is never overwritten. These limits do not cap monetary cost.
+The SDK may download its verified runtime into its user cache.
+Use the module entry point: direct script startup failed SDK import locally.
+The final sample completed using the module entry point.
+
+The runner hides rubrics and later follow-up messages. It disables configuration
+discovery, installed skills, file hooks, built-in/MCP tools and host Git
+operations. Only recording stubs are exposed; other permissions are denied.
+These stubs never contact REA or a tracker. This is not an OS sandbox.
+
+## Assess, then verify
+
+Collection saves **unassessed** responses, ordered tool calls and input hashes.
+It does not grade itself or update the installation evidence.
+
+1. Review each case's `must_do` and `must_not_do` against the actual responses.
+2. Record evidence for every item: `pass`, `fail`, or `not_observable`.
+3. Any failure fails the case; otherwise an unobservable item makes it
+   inconclusive. A promise to invoke is not an observed tool call.
+4. Preserve the previous result, then export assessed responses and traces to
+   [results.json](results.json), with the run's original fingerprints.
+5. Recheck current inputs, then verify without installing or calling AI:
+
+   ```sh
+   python3 scripts/workbench.py eval-inputs engineering-workbench
+   python3 scripts/workbench.py verify engineering-workbench
+   ```
+
+All required cases must pass against current inputs. Verification is separate
+from activation permission. Status and removal remain available when blocked.
 
 ## When must evals be repeated?
 
-Why: an old response cannot validate new instructions or a different scenario.
-
-| Change | Required check before adoption |
+| Change | Check before adoption |
 | --- | --- |
-| Skill instructions, description, or bundled resources | Required AI sample |
-| Case facts, prompt, rubric, budget, or selected sample | Required AI sample |
-| Copilot discovery/invocation wiring | Affected AI samples + discovery check |
-| Installer file mechanics or handoff helper only | Unit tests, lint/types |
-| Human-facing prose only | Markdownlint and relevant link checks |
+| Skill instructions/resources, cases/rubrics, policy | Required AI sample |
+| Copilot discovery/invocation wiring | Sample + discovery check |
+| Helper file mechanics only | Unit tests, lint/types |
+| Human-facing prose only | Markdownlint and relevant links |
 
-Any skill/resource byte or permission change conservatively invalidates its
-evidence, even formatting. When installer changes affect runtime semantics,
-update `runtimes/copilot.json` (for example a `revision` field) as part of that
-change so the gate invalidates prior evidence. Other helper-only edits do not
-require paid AI calls. Changes to policy require review, not silent relaxation.
+The gate fingerprints skill files/modes, cases, selected policy and runtime
+wiring. Changes invalidate old evidence. If helper changes affect discovery or
+invocation, update the wiring contract too. No force/skip flag exists.
 
-```text
-Relevant input change -> required real AI sample -> criterion review
-                                                       |
-                  Fresh passing record <---------------+
-                           |
-                 verify <skill> -> installation allowed
-                           |
-        Missing / stale / failed / inconclusive -> BLOCK
-```
+## Files and limits
 
-`evals/policy.json` maps each skill to cases and results. The required sample is
-`execution.sample_case_ids` in its cases file. Adding a skill requires its own
-policy entry and sample; the gate has no "skip unknown skills" fallback.
+- [cases.json](cases.json): tasks, supplied facts and rubrics. Twelve cases are
+  required: planning/PR follow-up, four REA, six slicing/scope/follow-up cases.
+  Four interaction cases use two turns and recording-only tools.
+- [run.py](run.py): Python SDK collector, not an automatic judge.
+- [results.json](results.json): latest assessed responses and tool traces.
+- [history/](history/): previous assessed failures, not conversation history
+  or gate input.
+- [policy.json](policy.json): maps each skill to its cases and results.
 
-Check without installing or calling any AI:
-
-```sh
-python3 scripts/workbench.py verify engineering-workbench
-```
-
-`install <skill> --activate` runs the same gate **before writing user files**.
-There is no force/skip flag. It checks passing required cases, a response and
-evidence for every criterion, supported execution metadata, and matching
-fingerprints. Removal and read-only installation status remain available when
-evals fail. Verification is separate from permission to activate.
-
-**Current example: blocked.** Planning failed its grilling criterion. The older
-record also lacks the new full-input fingerprints and predates the clarification
-to actually invoke the agreed grilling procedure. Preserve it as historical
-evidence; deliberately rerun before adoption. No new AI eval was run in this
-enforcement change. The revised grilling guidance is not behaviorally validated.
-
-This is a local saved-evidence gate, not proof the model calls occurred or the
-reviewer's judgment is correct. It does not install a Git hook, configure CI,
-prevent manual file copies, or replace an approved real-project trial.
-
-## What are the files?
-
-```text
-cases.json     Tasks + facts + grading checklists
-     |
-     +-- manual run and criterion-by-criterion review
-                                    |
-results.json                  Responses + assessments
-```
-
-- [Cases](cases.json): current examples target the Engineering Workbench skill,
-  not every future skill. Add relevant cases when adopting other skills.
-- [Results](results.json): two Copilot task-tool subagent responses from
-  20 October 2026. The latest repeat passed PR follow-up but **failed planning**
-  because it omitted the grilling offer. Assessment was by the assistant,
-  not an independent human. Seventeen cases are unrun, including the ten
-  required REA and slicing/scope/follow-up scenarios. Historical responses and
-  verdicts are unchanged.
-- `skill_sha256` is a fingerprint of the exact skill text used. A changed
-  fingerprint means old results do not validate the new version.
-
-<details>
-<summary>What these checks prove, and what they do not</summary>
-
-They show what the agent *said* under supplied facts and restrictions.
-They do not prove live Jira retrieval, GitHub tool use, real CI monitoring,
-permission enforcement, successful code changes, or repeated reliability.
-Blocking real actions in the eval harness is not evidence the skill would
-enforce permissions unaided.
-
-The unit tests check case/result structure and the recorded skill fingerprint.
-They **do not rerun the AI** or establish whether a verdict is sensible.
-See [tests](../tests/README.md) for that distinction.
-
-Historical records may legitimately refer to an older skill version:
-unit tests retain them, while `verify` rejects them as readiness evidence.
-The current response-only case checks a grilling *offer*, not invocation.
-To evaluate your selected "agree, then invoke" behavior, an additional staged
-case must supply user consent and observe the invocation. A docs variant must
-also check agreed file scope. Existing responses prove neither behavior.
-
-The required REA scenarios above cover source versus artifact routing and both
-consent branches. They still need actual evaluation before adoption.
-
-For example, the planning response asked useful requirements questions but
-never offered the available grilling procedure. That `must_do` item failed,
-so the case failed despite the rest being sensible. Retain that evidence;
-guidance is not a guarantee, and further improvement needs a deliberate change
-and another bounded evaluation rather than silently relabeling it a pass.
-
-The skill was supplied explicitly, not discovered through user-wide
-installation. Other runtimes, such as Claude Code, were not exercised.
-A small approved real-project trial remains necessary before retiring older
-customizations.
-
-</details>
+Seven optional cases remain unrun. These checks do not prove live Jira/PR/CI
+behavior, user-wide discovery, cross-runtime support or repeated reliability.
+An approved plan-only trial in a real project is still needed.

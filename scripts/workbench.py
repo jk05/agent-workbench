@@ -276,7 +276,8 @@ def verify_evals(name: str, files: dict[str, tuple[bytes, int]] | None = None) -
         or not results["assessment"].strip()
         or not isinstance(results.get("date"), str)
         or not results["date"].strip()
-        or results.get("execution_target") != "Copilot task-tool subagents"
+        or results.get("execution_target")
+        not in ("Copilot task-tool subagents", "Copilot Python SDK")
     ):
         raise WorkbenchError(
             f"missing or invalid Copilot eval assessment in: {results_path}"

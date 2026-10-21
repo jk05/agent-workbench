@@ -9,6 +9,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ExampleSkillEvalTests(unittest.TestCase):
+    def test_original_failure_is_preserved_separately(self):
+        historical = json.loads((ROOT / "evals/history/2026-10-20.json").read_text())
+        planning = next(
+            run for run in historical["runs"] if run["case_id"] == "ticket-planning"
+        )
+        self.assertEqual(planning["status"], "fail")
+        self.assertEqual(planning["criteria"][3]["verdict"], "fail")
+
     def test_example_skill_is_discoverable(self):
         skill = (ROOT / ".agents/skills/engineering-workbench/SKILL.md").read_text(
             encoding="utf-8"
@@ -105,7 +113,10 @@ class ExampleSkillEvalTests(unittest.TestCase):
         self.assertEqual(
             results["skill_path"], ".agents/skills/engineering-workbench/SKILL.md"
         )
-        self.assertEqual(results["execution_target"], "Copilot task-tool subagents")
+        self.assertIn(
+            results["execution_target"],
+            ("Copilot task-tool subagents", "Copilot Python SDK"),
+        )
         self.assertTrue(results["assessment"])
         by_id = {case["id"]: case for case in cases["cases"]}
         executed = [run["case_id"] for run in results["runs"]]
