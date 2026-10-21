@@ -62,6 +62,12 @@ a bounded change; remaining consequential questions are visible.
   risks/alternatives, exclusions, and verification strategy. Challenge
   unsupported assumptions, including the user's proposed cause when evidence
   disagrees.
+- Consider logical PR slices up front: each needs an outcome, scope/exclusions,
+  validation, real blockers, and proposed base/order. Prefer independently
+  verifiable, mergeable vertical slices; keep one cohesive PR when splitting
+  would create broken intermediate states or unnecessary coordination.
+  Offer an available `to-tickets` procedure when formal decomposition helps;
+  explain its ticket-writing side effects and obtain consent before invocation.
 - Resolve consequential ambiguity and obtain approval for scope not already
   approved. Respect plan-only requests. Reuse existing approval rather than
   repeatedly asking for it; seek renewed approval for consequential changes.
@@ -82,9 +88,17 @@ permission from "implement this."
 
 ## 3. Implement, validate, and review
 
-- Implement a small, complete slice using existing patterns. Add regression
-  coverage for changed behavior and validate the actual acceptance criteria,
-  including thresholds and output shapes.
+- Default to the smallest complete, production-appropriate slice satisfying
+  approved criteria unless broader scope is agreed. Use existing patterns and
+  straightforward code; abstractions, configuration, dependencies, wrappers,
+  and extension points need a demonstrated present benefit. Prefer clear names
+  and concise logic over redundant comments or ceremony, not code golfing.
+  Preserve required error handling, permissions, compatibility, and regression
+  coverage; MVP means minimal scope, not reduced quality.
+- Revisit slice boundaries and blockers as evidence changes or a slice grows.
+  Explain material replanning and seek approval for scope/base-strategy changes.
+  Defer unrelated cleanup and capture useful follow-ups as described below.
+  Validate actual criteria, including thresholds and output shapes.
 - Discover authoritative validation commands in the workspace. Run the smallest
   relevant checks, expanding to build, integration, browser, or CI checks as
   affected behavior requires. Record the revision or worktree tested and exact
@@ -95,8 +109,10 @@ permission from "implement this."
   blockers, and a proposed next step; follow a stricter workspace budget when
   present.
 - Review the current diff against both the approved outcome and correctness
-  risks. Re-run affected checks after fixes. Prior results do not validate a
-  later revision.
+  risks: every changed area should support the outcome or a necessary
+  prerequisite. Remove speculative complexity and unnecessary verbosity from
+  this change without starting an unrelated refactor. Re-run affected checks
+  after fixes. Prior results do not validate a later revision.
 - Suggest an available TDD procedure for test-first work, diagnosis for hard
   failures, or independent review for substantial/risky changes. Follow
   the suggestion/consent/invocation sequence above and each skill's invocation
@@ -121,6 +137,12 @@ Report validation gaps rather than calling them passed.
   threads. Verify the PR head matches the intended commit and associate checks
   with that SHA. Report pending, skipped, failed, and unavailable checks
   accurately.
+- While a PR waits, continue other approved, unblocked slices in isolated
+  branches/worktrees when safe. Dependent/stacked PRs need an agreed base
+  strategy; otherwise report the blocker and work on independent slices.
+  Track each PR's base, head, CI, comments, and dependencies separately.
+  When a prerequisite changes, recheck affected dependants and validation.
+  Waiting is not permission to merge, expand scope, or spawn parallel agents.
 - Diagnose CI failures and review suggestions against approved scope. Fix
   in-scope issues locally, validate, push if approved, and inspect the new
   head's checks and feedback. Apply the same repair bound. Escalate conflicting,
@@ -138,6 +160,28 @@ Report validation gaps rather than calling them passed.
 **Delivery report:** summarize behavior, validation and revision, PR if any,
 outstanding feedback, blockers, and the next decision/action. CI passing alone
 does not establish review completion.
+
+## Capture follow-up work without expanding scope
+
+When investigation, implementation, or review exposes useful deferred work:
+
+- State the observation/evidence, impact, proposed bounded follow-up, and why
+  it is deferred. Distinguish a useful improvement from a blocker that must be
+  resolved for the current acceptance criteria; do not defer required safety.
+- Look for an existing relevant ticket before proposing a new one. Show the
+  proposed destination and text, and confirm with the user at the point of
+  creating a ticket or adding a follow-up comment to the original ticket/code.
+  A delivery approval alone is not follow-up publication consent.
+- After approval, use the configured tracker, link the follow-up to the original
+  ticket and affected PR, and add the approved source-ticket comment. Add a
+  concise code comment only for a relevant non-obvious limitation, using the
+  confirmed ticket link and repository conventions; avoid scattered TODOs.
+- In the PR description (or local draft when publication is not approved), link
+  the original ticket and created/existing follow-ups; identify deferred work
+  and pending proposals without inventing ticket IDs or implying completion.
+  Check for duplicates before writes/retries. If declined or tools are
+  unavailable, keep an unposted proposal in the report/handoff; do not lose it
+  or block unrelated approved progress.
 
 ## Capability selection and cost
 
