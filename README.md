@@ -32,13 +32,20 @@ Requires Python 3.9+. Works in **VS Code Copilot** and **Claude Code**.
    ```sh
    git clone https://github.com/jk05/agent-workbench.git
    cd agent-workbench
-   for name in engineering-workbench lean-comments code-simplification \
-       workbench-reviewer; do
+   for name in engineering-workbench retro lean-comments \
+       code-simplification workbench-reviewer; do
      python3 scripts/workbench.py install "$name" --activate
    done
    ```
 
-3. In a fresh session in your project, ask:
+3. Tell `retro` where your clone is:
+
+   ```sh
+   mkdir -p ~/.agent-workbench
+   echo "repo: $PWD" > ~/.agent-workbench/config
+   ```
+
+4. In a fresh session in your project, ask:
 
    > Use engineering-workbench to investigate PE-1234. Plan only for now.
 

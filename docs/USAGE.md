@@ -56,6 +56,13 @@ outside every repository:
 
 The workflow reads that folder when it exists. Never commit it.
 
+## Retro
+
+Say "retro" at the end of a task. It proposes **one** change to this repo and
+applies it only after you approve the diff: on a `retro/` branch in your clone
+(path from `~/.agent-workbench/config`), with checks run, asking before any
+push. Each retro is logged in `~/.agent-workbench/retros.md`.
+
 ## Handoffs
 
 Ask the agent to pause; it saves a private Markdown handoff. In a new chat,
