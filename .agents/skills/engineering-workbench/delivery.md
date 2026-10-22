@@ -10,6 +10,14 @@ are distinct actions. An approved delivery sequence covers the actions it
 names; do not ask again for each. Without publication approval, leave the
 validated local changes and a draft PR description in the response.
 
+## What green means
+
+Discover the project's bar; never write one into its repo. In order: its
+`CONSTRAINTS.md` if present, then its CI workflows and check scripts (e.g.
+`.github/workflows/`, `package.json` scripts), then its lint, type, and test
+configs. Private extras, such as known flaky tests, live in
+`~/.agent-workbench/projects/<repo-name>/`.
+
 ## The CI-to-green loop
 
 1. Follow workspace branch, base, and title conventions. Check whether a PR

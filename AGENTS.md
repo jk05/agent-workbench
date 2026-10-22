@@ -13,6 +13,8 @@ These instructions protect scope and user-owned files during maintenance.
 - Keep the main `SKILL.md` under 120 lines (tested). Skill names belong in
   `skills-map.md`; detail belongs in linked files, read only when needed.
 - Write concisely: no repetition across docs, no unnecessary hedging.
+- This repo is public: no company code, ticket text, or private repo names.
+  Project specifics belong in `~/.agent-workbench/projects/<repo-name>/`.
 - Keep project knowledge in its workspace; private task state and credentials
   outside repositories.
 - Obtain explicit approval before user-wide installation, live configuration

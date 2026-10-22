@@ -24,7 +24,7 @@ skill from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
 | follow-ups, tickets | this workbench: [follow-ups.md](follow-ups.md) | workbench |
 | pause, resume | this workbench: [handoffs.md](handoffs.md) | workbench |
 | reverse-engineer | `reverse-engineer-anything` (optional, consent) | user |
-| retro | fallback in [SKILL.md](SKILL.md) until a retro skill exists | workbench |
+| retro | `retro` (this repo) | workbench |
 
 ## Install notes
 
