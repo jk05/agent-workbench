@@ -31,8 +31,7 @@ skill from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
 - **Superpowers** installs as a plugin in both Claude Code and VS Code Copilot,
   from `obra/superpowers-marketplace`. Its skills may appear as
   `superpowers:<name>`.
-- **`lean-comments` and `code-simplification`** are single skill folders, not
-  plugins. Until the workbench installer copies them, they may be absent; the
-  loop then uses its fallback.
+- **`lean-comments` and `code-simplification`** are copied into this repo at
+  a pinned commit (see each `NOTICE.md`) and installed with the workbench.
 - Install only the mapped `test-driven-development` (Superpowers). Addy's pack
   ships one with the same name; installing the whole pack makes them compete.

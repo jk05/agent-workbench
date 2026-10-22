@@ -1,4 +1,4 @@
-"""Manage selected skill folders for Copilot only; other runtimes are not supported."""
+"""Install selected skill folders for VS Code Copilot and Claude Code, plus handoffs."""
 
 from __future__ import annotations
 
@@ -15,6 +15,8 @@ from pathlib import Path
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 SKILLS_ROOT = REPOSITORY_ROOT / ".agents/skills"
 MANIFEST_VERSION = 2
+RUNTIMES = ["copilot", "claude-code"]
+RUNTIME_LABEL = "shared"
 SLUG_PATTERN = re.compile(r"[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?\Z")
 
 
@@ -43,16 +45,16 @@ def read_json_object(path: Path) -> dict:
     return value
 
 
-def copilot_wiring() -> dict:
-    wiring = read_json_object(REPOSITORY_ROOT / "runtimes/copilot.json")
+def skills_wiring() -> dict:
+    wiring = read_json_object(REPOSITORY_ROOT / "runtimes/skills.json")
     directory = wiring.get("personal_skills_directory")
     if (
-        wiring.get("schema_version") != 1
-        or wiring.get("runtime") != "copilot"
+        wiring.get("schema_version") != 2
+        or wiring.get("runtimes") != RUNTIMES
         or not isinstance(directory, str)
         or not safe_relative(directory)
     ):
-        raise WorkbenchError("invalid Copilot wiring in runtimes/copilot.json")
+        raise WorkbenchError("invalid wiring in runtimes/skills.json")
     return wiring
 
 
@@ -66,7 +68,7 @@ def paths(home: Path, state_root: Path | None) -> tuple[Path, Path]:
             else home / ".local/state"
         )
     state_root = state_root.expanduser().resolve() / "agent-workbench"
-    return home / copilot_wiring()["personal_skills_directory"], state_root
+    return home / skills_wiring()["personal_skills_directory"], state_root
 
 
 def validate_name(name: str) -> None:
@@ -75,7 +77,7 @@ def validate_name(name: str) -> None:
 
 
 def manifest_location(state: Path, name: str) -> Path:
-    return state / "installations/copilot" / f"{name}.json"
+    return state / "installations/skills" / f"{name}.json"
 
 
 def safe_relative(value: str) -> bool:
@@ -101,7 +103,7 @@ def read_manifest(manifest_path: Path, skill_directory: Path) -> dict | None:
         not isinstance(manifest, dict)
         or manifest.get("version") != MANIFEST_VERSION
         or manifest.get("destination") != str(skill_directory)
-        or manifest.get("runtime") != "copilot"
+        or manifest.get("runtime") != RUNTIME_LABEL
         or not isinstance(manifest.get("files"), dict)
         or "SKILL.md" not in manifest["files"]
     ):
@@ -240,7 +242,7 @@ def apply_files(
         if after:
             manifest = {
                 "version": MANIFEST_VERSION,
-                "runtime": "copilot",
+                "runtime": RUNTIME_LABEL,
                 "destination": str(directory),
                 "files": {name: file_record(value) for name, value in after.items()},
             }
@@ -291,17 +293,17 @@ def status(home: Path, state_root: Path | None, name: str | None) -> int:
     if name is None:
         _, state = paths(home, state_root)
         sources = [path.name for path in SKILLS_ROOT.iterdir() if path.is_dir()]
-        manifests = state / "installations/copilot"
+        manifests = state / "installations/skills"
         reject_symlinks(manifests)
         names = set(sources) | {path.stem for path in manifests.glob("*.json")}
         if not names:
-            print("Copilot: no source skills or managed installations")
+            print("No source skills or managed installations")
         return max(
             (status(home, state_root, item) for item in sorted(names)), default=0
         )
     directory, manifest_path = installation_paths(home, state_root, name)
     manifest = read_manifest(manifest_path, directory)
-    prefix = f"Copilot / {name}"
+    prefix = f"Skills / {name}"
     if manifest is None:
         if directory.exists():
             raise WorkbenchError(f"unmanaged path exists: {directory}")
@@ -320,7 +322,7 @@ def status(home: Path, state_root: Path | None, name: str | None) -> int:
 def install(home: Path, state_root: Path | None, name: str, activate: bool) -> None:
     if not activate:
         raise WorkbenchError(
-            "Copilot installation requires --activate to confirm user-level file writes"
+            "installation requires --activate to confirm user-level file writes"
         )
     after = source_files(name)
     directory, manifest_path = installation_paths(home, state_root, name)
@@ -337,21 +339,21 @@ def install(home: Path, state_root: Path | None, name: str, activate: bool) -> N
             if parent.exists() and not parent.is_dir():
                 raise WorkbenchError(f"file blocks destination folder: {parent}")
     apply_files(directory, manifest_path, before, after)
-    print(f"Copilot / {name}: installed at {directory}")
+    print(f"Skills / {name}: installed at {directory}")
 
 
 def remove(home: Path, state_root: Path | None, name: str, confirm: bool) -> None:
     if not confirm:
-        raise WorkbenchError("Copilot removal requires --confirm-removal")
+        raise WorkbenchError("removal requires --confirm-removal")
     directory, manifest_path = installation_paths(home, state_root, name)
     manifest = read_manifest(manifest_path, directory)
     if manifest is None:
-        raise WorkbenchError(f"no managed Copilot installation found for: {name}")
+        raise WorkbenchError(f"no managed installation found for: {name}")
     before = installed_files(directory, manifest)
     apply_files(directory, manifest_path, before, {})
     if directory.exists():
         print(f"preserved user-added files in: {directory}")
-    print(f"Copilot / {name}: removed managed files")
+    print(f"Skills / {name}: removed managed files")
 
 
 def git_value(workspace: Path, *arguments: str) -> str:
@@ -434,7 +436,7 @@ def show_handoff(home: Path, state_root: Path | None, name: str) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Copilot-only skill installer and private handoff helpers. Other runtimes (e.g. Claude Code) are not supported yet.",
+        description="Install skills for VS Code Copilot and Claude Code (one shared folder), and manage private handoffs.",
     )
     parser.add_argument(
         "--home", type=Path, default=Path.home(), help=argparse.SUPPRESS
@@ -447,21 +449,19 @@ def build_parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(dest="command", required=True)
 
     status_parser = commands.add_parser(
-        "status", help="report Copilot installations without writes"
+        "status", help="report installations without writes"
     )
     status_parser.add_argument(
         "skill", nargs="?", help="skill folder name; omit to list all known skills"
     )
     apply_parser = commands.add_parser(
-        "install", help="install/update one selected skill folder for Copilot"
+        "install", help="install/update one selected skill folder"
     )
     apply_parser.add_argument("skill", help="folder name under .agents/skills/")
     apply_parser.add_argument(
         "--activate", action="store_true", help="confirm user-level file writes"
     )
-    remove_parser = commands.add_parser(
-        "remove", help="remove one managed Copilot skill"
-    )
+    remove_parser = commands.add_parser("remove", help="remove one managed skill")
     remove_parser.add_argument(
         "skill", help="installed skill name (source need not exist)"
     )

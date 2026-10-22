@@ -1,3 +1,8 @@
 {
-  "ignores": [".local/**"]
+  "ignores": [
+    ".local/**",
+    // Third-party skills are copied unchanged; see each NOTICE.md.
+    ".agents/skills/lean-comments/SKILL.md",
+    ".agents/skills/code-simplification/SKILL.md"
+  ]
 }

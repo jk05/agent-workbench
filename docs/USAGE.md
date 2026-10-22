@@ -3,7 +3,7 @@
 **Why:** edit skills here, then reuse the approved version in every project.
 
 ```text
-.agents/skills/<name>/   -- install (approved) -->   ~/.agents/skills/<name>/
+.agents/skills/<name>/   -- install (approved) -->   ~/.claude/skills/<name>/
                                   |
                        private ownership record
                        (hashes + file permissions)
@@ -29,7 +29,8 @@ python3 scripts/workbench.py remove engineering-workbench --confirm-removal
 
 ## Use the workflow
 
-Ask in a fresh Copilot Agents session, or type `/engineering-workbench`:
+Ask in a fresh Copilot Agents or Claude Code session, or type
+`/engineering-workbench`:
 
 > Use engineering-workbench to investigate PE-1234. Plan only for now.
 

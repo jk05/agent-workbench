@@ -24,6 +24,13 @@ class EngineeringWorkbenchSkillTests(unittest.TestCase):
         self.assertNotIn("disable-model-invocation: true", frontmatter)
         self.assertTrue(body.strip())
 
+    def test_every_skill_folder_is_named_in_its_frontmatter(self):
+        for folder in (ROOT / ".agents/skills").iterdir():
+            if folder.is_dir():
+                skill = (folder / "SKILL.md").read_text(encoding="utf-8")
+                frontmatter = skill.split("\n---\n", 1)[0].splitlines()
+                self.assertIn(f"name: {folder.name}", frontmatter, folder.name)
+
     def test_main_skill_stays_small(self):
         skill = SKILL_DIRECTORY / "SKILL.md"
         lines = skill.read_text(encoding="utf-8").splitlines()

@@ -21,29 +21,31 @@ Merging, deploying, ticket writes, and installs always come back to you.
 
 ## How
 
-Requires Python 3.9+. Installation supports **Copilot in VS Code** today;
-Claude Code support is next.
+Requires Python 3.9+. Works in **VS Code Copilot** and **Claude Code**.
 
-```sh
-git clone https://github.com/jk05/agent-workbench.git
-cd agent-workbench
-python3 scripts/workbench.py install engineering-workbench --activate
-```
+1. Install Superpowers as a plugin in each runtime: see the
+   [skills map](.agents/skills/engineering-workbench/skills-map.md).
+2. Install the skills from this repo into `~/.claude/skills/`, which both
+   runtimes read:
 
-Then, in a fresh Copilot Agents session in your project:
+   ```sh
+   git clone https://github.com/jk05/agent-workbench.git
+   cd agent-workbench
+   for skill in engineering-workbench lean-comments code-simplification; do
+     python3 scripts/workbench.py install "$skill" --activate
+   done
+   ```
 
-> Use engineering-workbench to investigate PE-1234. Plan only for now.
+3. In a fresh session in your project, ask:
 
-The helper only copies skill files to `~/.agents/skills/`; Copilot does the
-work. Install the mapped skills too: see the
-[skills map](.agents/skills/engineering-workbench/skills-map.md).
+   > Use engineering-workbench to investigate PE-1234. Plan only for now.
 
 <details>
 <summary>More</summary>
 
 - [Usage](docs/USAGE.md): install, update, remove, handoffs, project notes.
 - [Why this design](docs/PROJECT-INTENT.md): decisions and boundaries.
-- [Copilot discovery](docs/copilot-discovery.md): why this install path works.
+- [Runtime discovery](docs/runtime-discovery.md): why one install serves both.
 - [Tests](tests/README.md): helper and skill-structure checks.
 
 ```sh
