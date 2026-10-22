@@ -62,10 +62,11 @@ base strategy, or permissions must change. For each slice:
    non-obvious constraints or rationale; no narration or scattered TODOs.
 3. **Simplify** (role: simplify). Fallback: remove speculative complexity,
    dead code, and redundancy from this diff only; no unrelated refactor.
-4. **Review** (role: review): a context that did not write the code reviews the
-   diff against the plan and acceptance criteria. Give it the plan, criteria,
-   and diff or SHA in one request; it reports, you decide (role: receive-review).
-   Fallback: pause with a handoff so a fresh session reviews only the diff.
+4. **Review** (role: review): run the `workbench-reviewer` subagent (or the
+   project's own reviewer agent), which did not write the code, against the
+   plan and acceptance criteria. Give it the plan, criteria, and diff in one
+   request; it reports and you decide (role: receive-review). Fallback: a
+   handoff so a fresh session reviews it.
 5. **Verify** (role: verify): run the workspace's checks for affected behavior
    and record the revision and exact outcomes. Earlier results do not validate
    a later revision.

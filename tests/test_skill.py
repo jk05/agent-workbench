@@ -31,6 +31,11 @@ class EngineeringWorkbenchSkillTests(unittest.TestCase):
                 frontmatter = skill.split("\n---\n", 1)[0].splitlines()
                 self.assertIn(f"name: {folder.name}", frontmatter, folder.name)
 
+    def test_every_agent_is_named_in_its_frontmatter(self):
+        for agent in (ROOT / ".agents/agents").glob("*.md"):
+            frontmatter = agent.read_text(encoding="utf-8").split("\n---\n", 1)[0]
+            self.assertIn(f"name: {agent.stem}", frontmatter.splitlines(), agent.name)
+
     def test_main_skill_stays_small(self):
         skill = SKILL_DIRECTORY / "SKILL.md"
         lines = skill.read_text(encoding="utf-8").splitlines()

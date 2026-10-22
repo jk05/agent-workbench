@@ -18,8 +18,13 @@ Checked against the VS Code and Claude Code docs on **22 October 2026**.
 | Plugins | `chat.plugins.marketplaces` setting | `claude plugin` |
 
 `~/.claude/skills/` is the only personal folder both read, so the installer
-uses it ([wiring](../runtimes/skills.json)). Installing into two folders would
+uses it ([wiring](../runtimes/wiring.json)). Installing into two folders would
 make Copilot list each skill twice.
+
+Agents differ: each runtime has its own folder, so the installer copies the
+same file to both. One file works in both because Copilot accepts Claude
+Code's tool names (`Read`, `Grep`, `Glob`) as aliases
+([Copilot agent reference](https://docs.github.com/en/copilot/reference/custom-agents-configuration)).
 
 **Observed 22 October 2026:** after one install there, each skill appeared
 exactly once in both a new Copilot (Agents window) chat and Claude Code.

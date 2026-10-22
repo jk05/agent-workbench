@@ -20,6 +20,8 @@ python3 scripts/workbench.py install engineering-workbench --activate
 python3 scripts/workbench.py remove engineering-workbench --confirm-removal
 ```
 
+- **Agents:** `.agents/agents/<name>.md` installs the same way, copied to
+  `~/.claude/agents/` and `~/.copilot/agents/`.
 - **Update:** edit the source, run the tests, install again.
 - **Safety:** the helper only touches files it installed. It refuses to
   overwrite edits you made to the installed copy or unmanaged files, keeps

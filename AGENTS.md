@@ -25,7 +25,7 @@ These instructions protect scope and user-owned files during maintenance.
   and report what was and was not exercised. Add an eval only when a retro
   shows a real failure worth guarding; never spend AI budget silently.
 - If installer changes alter discovery or invocation, update
-  `runtimes/skills.json` and the [discovery notes](docs/runtime-discovery.md).
+  `runtimes/wiring.json` and the [discovery notes](docs/runtime-discovery.md).
 - Lead user-facing docs with why/what/how and short diagrams. Keep the visible
   README concise and detailed reference material collapsible.
 

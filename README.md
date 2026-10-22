@@ -25,14 +25,16 @@ Requires Python 3.9+. Works in **VS Code Copilot** and **Claude Code**.
 
 1. Install Superpowers as a plugin in each runtime: see the
    [skills map](.agents/skills/engineering-workbench/skills-map.md).
-2. Install the skills from this repo into `~/.claude/skills/`, which both
-   runtimes read:
+2. Install this repo's skills (into `~/.claude/skills/`, read by both
+   runtimes) and the `workbench-reviewer` agent (into each runtime's agents
+   folder):
 
    ```sh
    git clone https://github.com/jk05/agent-workbench.git
    cd agent-workbench
-   for skill in engineering-workbench lean-comments code-simplification; do
-     python3 scripts/workbench.py install "$skill" --activate
+   for name in engineering-workbench lean-comments code-simplification \
+       workbench-reviewer; do
+     python3 scripts/workbench.py install "$name" --activate
    done
    ```
 
