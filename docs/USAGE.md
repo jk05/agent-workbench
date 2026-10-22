@@ -3,10 +3,11 @@
 **Why:** edit skills here, then reuse the approved version in every project.
 
 ```text
-.agents/skills/<name>/   -- install (approved) -->   ~/.claude/skills/<name>/
-                                  |
-                       private ownership record
-                       (hashes + file permissions)
+.agents/skills/<name>/  -- install (approved) -->  ~/.agents/skills/<name>/
+                                                   ~/.claude/skills/<name>/
+                                 |
+                      private ownership record per copy
+                      (hashes + file permissions)
 ```
 
 The helper only copies files. It never runs an AI, configures MCP, or touches

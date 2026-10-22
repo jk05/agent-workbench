@@ -25,9 +25,8 @@ Requires Python 3.9+. Works in **VS Code Copilot** and **Claude Code**.
 
 1. Install Superpowers as a plugin in each runtime: see the
    [skills map](.agents/skills/engineering-workbench/skills-map.md).
-2. Install this repo's skills (into `~/.claude/skills/`, read by both
-   runtimes) and the `workbench-reviewer` agent (into each runtime's agents
-   folder):
+2. Install this repo's skills and the `workbench-reviewer` agent; each is
+   copied into both runtimes' folders:
 
    ```sh
    git clone https://github.com/jk05/agent-workbench.git

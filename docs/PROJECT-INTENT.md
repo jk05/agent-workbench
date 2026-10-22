@@ -3,7 +3,7 @@
 **Plan clearly, build reliably, improve through retros.**
 
 A personal, portable engineering workflow. It is **not an agent runtime**:
-VS Code Copilot and Claude Code run it from one shared install.
+VS Code Copilot and Claude Code each get the same installed copy.
 
 ## What belongs where
 
