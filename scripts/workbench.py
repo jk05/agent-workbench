@@ -58,20 +58,19 @@ def read_json_object(path: Path) -> dict:
 
 def wiring() -> dict:
     wiring = read_json_object(REPOSITORY_ROOT / "runtimes/wiring.json")
-    skills = wiring.get("personal_skills_directory")
-    agents = wiring.get("personal_agents_directories")
-    if (
-        wiring.get("schema_version") != 3
-        or wiring.get("runtimes") != RUNTIMES
-        or not isinstance(skills, str)
-        or not safe_relative(skills)
-        or not isinstance(agents, dict)
-        or sorted(agents) != sorted(RUNTIMES)
-        or not all(
-            isinstance(value, str) and safe_relative(value) for value in agents.values()
-        )
-    ):
+    if wiring.get("schema_version") != 4 or wiring.get("runtimes") != RUNTIMES:
         raise WorkbenchError("invalid wiring in runtimes/wiring.json")
+    for key in ("personal_skills_directories", "personal_agents_directories"):
+        directories = wiring.get(key)
+        if (
+            not isinstance(directories, dict)
+            or sorted(directories) != sorted(RUNTIMES)
+            or not all(
+                isinstance(value, str) and safe_relative(value)
+                for value in directories.values()
+            )
+        ):
+            raise WorkbenchError(f"invalid {key} in runtimes/wiring.json")
     return wiring
 
 
@@ -307,9 +306,9 @@ def is_agent(name: str, state: Path) -> bool:
     agent = (AGENTS_ROOT / f"{name}.md").is_file() or any(
         (state / "installations/agents").glob(f"*/{name}.json")
     )
-    skill = (SKILLS_ROOT / name).is_dir() or (
-        state / "installations/skills" / f"{name}.json"
-    ).exists()
+    skill = (SKILLS_ROOT / name).is_dir() or any(
+        (state / "installations/skills").glob(f"*/{name}.json")
+    )
     if agent and skill:
         raise WorkbenchError(f"name is used by both a skill and an agent: {name}")
     return agent
@@ -324,18 +323,21 @@ def targets(home: Path, state_root: Path | None, name: str) -> list[Target]:
             f"legacy single-skill manifest found: {legacy}; remove using the previous helper before switching"
         )
     config = wiring()
-    if not is_agent(name, state):
-        destination = home / config["personal_skills_directory"] / name
-        reject_symlinks(destination)
-        manifest = state / "installations/skills" / f"{name}.json"
-        return [Target(f"Skills / {name}", destination, manifest, "SKILL.md", False)]
+    agent = is_agent(name, state)
     found = []
     for runtime in RUNTIMES:
-        directory = home / config["personal_agents_directories"][runtime]
+        if agent:
+            directory = home / config["personal_agents_directories"][runtime]
+            manifest = state / "installations/agents" / runtime / f"{name}.json"
+            label = f"Agent / {name} ({runtime})"
+            item = Target(label, directory, manifest, f"{name}.md", True)
+        else:
+            directory = home / config["personal_skills_directories"][runtime] / name
+            manifest = state / "installations/skills" / runtime / f"{name}.json"
+            label = f"Skill / {name} ({runtime})"
+            item = Target(label, directory, manifest, "SKILL.md", False)
         reject_symlinks(directory)
-        manifest = state / "installations/agents" / runtime / f"{name}.json"
-        label = f"Agent / {name} ({runtime})"
-        found.append(Target(label, directory, manifest, f"{name}.md", True))
+        found.append(item)
     return found
 
 
@@ -356,7 +358,7 @@ def known_names(state: Path) -> set[str]:
     names = {path.name for path in SKILLS_ROOT.iterdir() if path.is_dir()}
     if AGENTS_ROOT.is_dir():
         names |= {path.stem for path in AGENTS_ROOT.glob("*.md")}
-    for pattern in ("installations/skills/*.json", "installations/agents/*/*.json"):
+    for pattern in ("installations/skills/*/*.json", "installations/agents/*/*.json"):
         reject_symlinks(state / pattern.split("/*")[0])
         names |= {path.stem for path in state.glob(pattern)}
     return names

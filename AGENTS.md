@@ -5,9 +5,9 @@ These instructions protect scope and user-owned files during maintenance.
 
 - Read [README.md](README.md) for entry points and
   [project intent](docs/PROJECT-INTENT.md) for design decisions.
-- Skills install once into `~/.claude/skills/`, read by both VS Code Copilot
-  and Claude Code. Read [discovery evidence](docs/runtime-discovery.md) before
-  changing wiring; verify current primary docs before adding a runtime.
+- Skills and agents install into each runtime's own folder (VS Code Copilot
+  and Claude Code). Read [discovery evidence](docs/runtime-discovery.md) before
+  changing wiring; verify docs and observed behavior before adding a runtime.
 - Skills live in `.agents/skills/`. Engineering Workbench is the first example,
   not a hardcoded installer dependency. Keep complete skill folders reusable.
 - Keep the main `SKILL.md` under 120 lines (tested). Skill names belong in

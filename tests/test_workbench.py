@@ -38,9 +38,12 @@ class InstallerFixture(unittest.TestCase):
         (self.root / "runtimes/wiring.json").write_text(
             json.dumps(
                 {
-                    "schema_version": 3,
+                    "schema_version": 4,
                     "runtimes": ["copilot", "claude-code"],
-                    "personal_skills_directory": ".claude/skills",
+                    "personal_skills_directories": {
+                        "copilot": ".agents/skills",
+                        "claude-code": ".claude/skills",
+                    },
                     "personal_agents_directories": {
                         "copilot": ".copilot/agents",
                         "claude-code": ".claude/agents",
@@ -71,7 +74,11 @@ class InstallerFixture(unittest.TestCase):
         return self.home / ".claude/skills" / name
 
     def manifest(self, name="example-one"):
-        return self.state / "agent-workbench/installations/skills" / f"{name}.json"
+        return (
+            self.state
+            / "agent-workbench/installations/skills/claude-code"
+            / f"{name}.json"
+        )
 
     def install(self, name="example-one"):
         workbench.install(self.home, self.state, name, True)
@@ -285,6 +292,29 @@ class SkillInstallerTests(InstallerFixture):
         self.assertEqual(legacy.read_text(), '{"version": 1}')
 
 
+class PerRuntimeSkillTests(InstallerFixture):
+    def test_skill_installs_identical_copies_per_runtime(self):
+        self.install()
+        copies = [
+            self.home / ".agents/skills/example-one",
+            self.home / ".claude/skills/example-one",
+        ]
+        for copy in copies:
+            self.assertEqual(
+                (copy / "SKILL.md").read_bytes(),
+                (self.sources / "example-one/SKILL.md").read_bytes(),
+            )
+        self.remove()
+        self.assertFalse(any(copy.exists() for copy in copies))
+
+    def test_unmanaged_copy_in_one_runtime_blocks_both(self):
+        blocker = self.home / ".agents/skills/example-one"
+        blocker.mkdir(parents=True)
+        with self.assertRaisesRegex(workbench.WorkbenchError, "unmanaged"):
+            self.install()
+        self.assertFalse(self.destination().exists())
+
+
 class AgentInstallerTests(InstallerFixture):
     def setUp(self):
         super().setUp()
@@ -375,7 +405,11 @@ class HandoffAndCliTests(unittest.TestCase):
     def test_cli_status_has_no_writes(self):
         result = self.run_cli("status", "engineering-workbench")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("Skills / engineering-workbench: not installed", result.stdout)
+        for runtime in ("copilot", "claude-code"):
+            self.assertIn(
+                f"Skill / engineering-workbench ({runtime}): not installed",
+                result.stdout,
+            )
         self.assertFalse(self.home.exists())
         self.assertFalse(self.state.exists())
 
