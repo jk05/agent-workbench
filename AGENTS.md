@@ -10,24 +10,22 @@ These instructions protect scope and user-owned files during maintenance.
   verify current primary docs before supporting another runtime.
 - Skills live in `.agents/skills/`. Engineering Workbench is the first example,
   not a hardcoded installer dependency. Keep complete skill folders reusable.
+- Keep the main `SKILL.md` under 120 lines (tested). Skill names belong in
+  `skills-map.md`; detail belongs in linked files, read only when needed.
+- Write concisely: no repetition across docs, no unnecessary hedging.
 - Keep project knowledge in its workspace; private task state and credentials
   outside repositories.
 - Obtain explicit approval before user-wide installation, live configuration
   changes, publishing, or retirement of existing customizations.
 - Preserve unrelated content. Cover ownership, drift, removal, and ordinary
   write-error rollback with deterministic fixture tests.
-- Separate helper tests from agent evals; report unrun or limited checks
-  honestly. See [tests](tests/README.md) and [evals](evals/README.md).
-- Before adopting skill/resource, eval-case/rubric, or Copilot-wiring changes,
-  run the affected skill's required real AI sample and review every criterion.
-  Follow the [rerun policy](evals/README.md#when-must-evals-be-repeated).
-  Installer-only/handoff changes need unit tests; prose-only docs need lint.
-  If installer changes alter discovery or invocation semantics, update the
-  Copilot wiring contract and rerun the affected evals as well.
-- Installation/update requires `verify <skill>` to pass saved-evidence checks.
-  Keep failed or stale results visible; never refresh fingerprints or change
-  verdicts without an actual run and assessment. Do not silently spend AI
-  budget, weaken criteria, or bypass the gate to achieve completion.
+- Changes need the unit tests and markdownlint below. Report unrun or limited
+  checks honestly. See [tests](tests/README.md).
+- There are no agent evals for now. Try skill behavior changes on a real task
+  and report what was and was not exercised. Add an eval only when a retro
+  shows a real failure worth guarding; never spend AI budget silently.
+- If installer changes alter discovery or invocation, update the Copilot
+  wiring contract and the [discovery notes](docs/copilot-discovery.md).
 - Lead user-facing docs with why/what/how and short diagrams. Keep the visible
   README concise and detailed reference material collapsible.
 
@@ -35,7 +33,5 @@ Run the local checks with:
 
 ```sh
 python3 -m unittest discover -s tests -v
-python3 -m json.tool evals/cases.json
-python3 -m json.tool evals/results.json
 npx --yes markdownlint-cli2@0.23.3 "**/*.md"
 ```
