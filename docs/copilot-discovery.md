@@ -28,8 +28,7 @@ The official [skills documentation][skills] lists:
 
 We use `.agents/skills/` for source and `~/.agents/skills/` for Copilot
 installation. This avoids settings edits and leaves other skills alone.
-The helper reads [the wiring contract](../runtimes/copilot.json); changing it
-invalidates saved eval evidence before installation is allowed.
+The helper reads [the wiring contract](../runtimes/copilot.json).
 Workspace slash invocation was observed in this repository. Personal
 installation and real-project behavior have not been exercised.
 
