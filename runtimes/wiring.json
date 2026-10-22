@@ -1,0 +1,9 @@
+{
+  "schema_version": 3,
+  "runtimes": ["copilot", "claude-code"],
+  "personal_skills_directory": ".claude/skills",
+  "personal_agents_directories": {
+    "copilot": ".copilot/agents",
+    "claude-code": ".claude/agents"
+  }
+}

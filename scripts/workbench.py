@@ -1,4 +1,4 @@
-"""Install selected skill folders for VS Code Copilot and Claude Code, plus handoffs."""
+"""Install skills and agents for VS Code Copilot and Claude Code, plus handoffs."""
 
 from __future__ import annotations
 
@@ -11,9 +11,11 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from typing import NamedTuple
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 SKILLS_ROOT = REPOSITORY_ROOT / ".agents/skills"
+AGENTS_ROOT = REPOSITORY_ROOT / ".agents/agents"
 MANIFEST_VERSION = 2
 RUNTIMES = ["copilot", "claude-code"]
 RUNTIME_LABEL = "shared"
@@ -22,6 +24,15 @@ SLUG_PATTERN = re.compile(r"[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?\Z")
 
 class WorkbenchError(Exception):
     """An expected, user-actionable workbench error."""
+
+
+class Target(NamedTuple):
+    label: str
+    directory: Path
+    manifest: Path
+    required: str
+    # Agent folders also hold files the workbench does not own.
+    shared: bool
 
 
 def digest(contents: bytes) -> str:
@@ -45,16 +56,22 @@ def read_json_object(path: Path) -> dict:
     return value
 
 
-def skills_wiring() -> dict:
-    wiring = read_json_object(REPOSITORY_ROOT / "runtimes/skills.json")
-    directory = wiring.get("personal_skills_directory")
+def wiring() -> dict:
+    wiring = read_json_object(REPOSITORY_ROOT / "runtimes/wiring.json")
+    skills = wiring.get("personal_skills_directory")
+    agents = wiring.get("personal_agents_directories")
     if (
-        wiring.get("schema_version") != 2
+        wiring.get("schema_version") != 3
         or wiring.get("runtimes") != RUNTIMES
-        or not isinstance(directory, str)
-        or not safe_relative(directory)
+        or not isinstance(skills, str)
+        or not safe_relative(skills)
+        or not isinstance(agents, dict)
+        or sorted(agents) != sorted(RUNTIMES)
+        or not all(
+            isinstance(value, str) and safe_relative(value) for value in agents.values()
+        )
     ):
-        raise WorkbenchError("invalid wiring in runtimes/skills.json")
+        raise WorkbenchError("invalid wiring in runtimes/wiring.json")
     return wiring
 
 
@@ -67,17 +84,12 @@ def paths(home: Path, state_root: Path | None) -> tuple[Path, Path]:
             if configured_state
             else home / ".local/state"
         )
-    state_root = state_root.expanduser().resolve() / "agent-workbench"
-    return home / skills_wiring()["personal_skills_directory"], state_root
+    return home, state_root.expanduser().resolve() / "agent-workbench"
 
 
 def validate_name(name: str) -> None:
     if not SLUG_PATTERN.fullmatch(name):
-        raise WorkbenchError("skill name must be a lowercase kebab-case slug")
-
-
-def manifest_location(state: Path, name: str) -> Path:
-    return state / "installations/skills" / f"{name}.json"
+        raise WorkbenchError("name must be a lowercase kebab-case slug")
 
 
 def safe_relative(value: str) -> bool:
@@ -89,7 +101,8 @@ def safe_relative(value: str) -> bool:
     )
 
 
-def read_manifest(manifest_path: Path, skill_directory: Path) -> dict | None:
+def read_manifest(target: Target) -> dict | None:
+    manifest_path, skill_directory = target.manifest, target.directory
     reject_symlinks(manifest_path)
     if not manifest_path.exists():
         return None
@@ -105,7 +118,7 @@ def read_manifest(manifest_path: Path, skill_directory: Path) -> dict | None:
         or manifest.get("destination") != str(skill_directory)
         or manifest.get("runtime") != RUNTIME_LABEL
         or not isinstance(manifest.get("files"), dict)
-        or "SKILL.md" not in manifest["files"]
+        or target.required not in manifest["files"]
     ):
         raise WorkbenchError(f"unrecognized install manifest: {manifest_path}")
     for name, metadata in manifest["files"].items():
@@ -179,21 +192,35 @@ def source_files(name: str) -> dict[str, tuple[bytes, int]]:
                 files[path.relative_to(directory).as_posix()] = snapshot
     if "SKILL.md" not in files:
         raise WorkbenchError(f"missing SKILL.md: {directory}")
-    text = files["SKILL.md"][0].decode("utf-8")
+    check_frontmatter(files["SKILL.md"][0], name, directory / "SKILL.md")
+    return files
+
+
+def agent_files(name: str) -> dict[str, tuple[bytes, int]]:
+    validate_name(name)
+    path = AGENTS_ROOT / f"{name}.md"
+    snapshot = snapshot_file(path)
+    if snapshot is None:
+        raise WorkbenchError(f"agent source not found: {path}")
+    check_frontmatter(snapshot[0], name, path)
+    return {f"{name}.md": snapshot}
+
+
+def check_frontmatter(contents: bytes, name: str, path: Path) -> None:
+    text = contents.decode("utf-8")
     if not text.startswith("---\n") or "\n---\n" not in text[4:]:
-        raise WorkbenchError(f"missing YAML frontmatter: {directory / 'SKILL.md'}")
+        raise WorkbenchError(f"missing YAML frontmatter: {path}")
     frontmatter = text[4:].split("\n---\n", 1)[0].splitlines()
     if not any(
         line.strip() in (f"name: {name}", f'name: "{name}"', f"name: '{name}'")
         for line in frontmatter
     ):
-        raise WorkbenchError(f"skill name must match source folder: {name}")
+        raise WorkbenchError(f"name must match source: {name}")
     if not any(
         line.startswith("description:") and line.partition(":")[2].strip()
         for line in frontmatter
     ):
-        raise WorkbenchError(f"skill description required: {name}")
-    return files
+        raise WorkbenchError(f"description required: {name}")
 
 
 def installed_files(directory: Path, manifest: dict) -> dict[str, tuple[bytes, int]]:
@@ -216,11 +243,11 @@ def clean_empty_parents(path: Path, boundary: Path) -> None:
 
 
 def apply_files(
-    directory: Path,
-    manifest_path: Path,
+    item: Target,
     before: dict[str, tuple[bytes, int]],
     after: dict[str, tuple[bytes, int]],
 ) -> None:
+    directory, manifest_path, shared = item.directory, item.manifest, item.shared
     touched = []
     try:
         for name in sorted(before.keys() | after.keys()):
@@ -262,7 +289,8 @@ def apply_files(
                     target.chmod(mode)
                 else:
                     target.unlink()
-                    clean_empty_parents(target.parent, directory)
+                    if not shared:
+                        clean_empty_parents(target.parent, directory)
         except OSError as rollback_error:
             raise WorkbenchError(
                 f"operation failed: {error}; rollback also failed: {rollback_error}"
@@ -271,51 +299,91 @@ def apply_files(
             f"operation failed; managed files restored: {error}"
         ) from error
     for name in before.keys() - after.keys():
-        clean_empty_parents((directory / name).parent, directory)
+        if not shared:
+            clean_empty_parents((directory / name).parent, directory)
 
 
-def installation_paths(
-    home: Path, state_root: Path | None, name: str
-) -> tuple[Path, Path]:
+def is_agent(name: str, state: Path) -> bool:
+    agent = (AGENTS_ROOT / f"{name}.md").is_file() or any(
+        (state / "installations/agents").glob(f"*/{name}.json")
+    )
+    skill = (SKILLS_ROOT / name).is_dir() or (
+        state / "installations/skills" / f"{name}.json"
+    ).exists()
+    if agent and skill:
+        raise WorkbenchError(f"name is used by both a skill and an agent: {name}")
+    return agent
+
+
+def targets(home: Path, state_root: Path | None, name: str) -> list[Target]:
     validate_name(name)
-    skills, state = paths(home, state_root)
+    home, state = paths(home, state_root)
     legacy = state / "install.json"
     if legacy.exists() or legacy.is_symlink():
         raise WorkbenchError(
             f"legacy single-skill manifest found: {legacy}; remove using the previous helper before switching"
         )
-    destination = skills / name
-    reject_symlinks(destination)
-    return destination, manifest_location(state, name)
+    config = wiring()
+    if not is_agent(name, state):
+        destination = home / config["personal_skills_directory"] / name
+        reject_symlinks(destination)
+        manifest = state / "installations/skills" / f"{name}.json"
+        return [Target(f"Skills / {name}", destination, manifest, "SKILL.md", False)]
+    found = []
+    for runtime in RUNTIMES:
+        directory = home / config["personal_agents_directories"][runtime]
+        reject_symlinks(directory)
+        manifest = state / "installations/agents" / runtime / f"{name}.json"
+        label = f"Agent / {name} ({runtime})"
+        found.append(Target(label, directory, manifest, f"{name}.md", True))
+    return found
+
+
+def source_for(item: Target, name: str) -> dict[str, tuple[bytes, int]]:
+    return agent_files(name) if item.shared else source_files(name)
+
+
+def source_exists(item: Target, name: str) -> bool:
+    return (AGENTS_ROOT / f"{name}.md" if item.shared else SKILLS_ROOT / name).exists()
+
+
+def unmanaged(item: Target) -> bool:
+    path = item.directory / item.required if item.shared else item.directory
+    return path.exists() or path.is_symlink()
+
+
+def known_names(state: Path) -> set[str]:
+    names = {path.name for path in SKILLS_ROOT.iterdir() if path.is_dir()}
+    if AGENTS_ROOT.is_dir():
+        names |= {path.stem for path in AGENTS_ROOT.glob("*.md")}
+    for pattern in ("installations/skills/*.json", "installations/agents/*/*.json"):
+        reject_symlinks(state / pattern.split("/*")[0])
+        names |= {path.stem for path in state.glob(pattern)}
+    return names
 
 
 def status(home: Path, state_root: Path | None, name: str | None) -> int:
     if name is None:
-        _, state = paths(home, state_root)
-        sources = [path.name for path in SKILLS_ROOT.iterdir() if path.is_dir()]
-        manifests = state / "installations/skills"
-        reject_symlinks(manifests)
-        names = set(sources) | {path.stem for path in manifests.glob("*.json")}
+        names = known_names(paths(home, state_root)[1])
         if not names:
-            print("No source skills or managed installations")
+            print("No source skills, agents, or managed installations")
         return max(
             (status(home, state_root, item) for item in sorted(names)), default=0
         )
-    directory, manifest_path = installation_paths(home, state_root, name)
-    manifest = read_manifest(manifest_path, directory)
-    prefix = f"Skills / {name}"
-    if manifest is None:
-        if directory.exists():
-            raise WorkbenchError(f"unmanaged path exists: {directory}")
-        print(f"{prefix}: not installed")
-        return 0
-    current = installed_files(directory, manifest)
-    if not (SKILLS_ROOT / name).exists():
-        print(f"{prefix}: installed; source missing (removal still available)")
-    elif current != source_files(name):
-        print(f"{prefix}: update available")
-    else:
-        print(f"{prefix}: installed and in sync")
+    for item in targets(home, state_root, name):
+        manifest = read_manifest(item)
+        if manifest is None:
+            if unmanaged(item):
+                raise WorkbenchError(f"unmanaged path exists: {item.directory}")
+            print(f"{item.label}: not installed")
+            continue
+        current = installed_files(item.directory, manifest)
+        if not source_exists(item, name):
+            print(f"{item.label}: installed; source missing (removal still available)")
+        elif current != source_for(item, name):
+            print(f"{item.label}: update available")
+        else:
+            print(f"{item.label}: installed and in sync")
     return 0
 
 
@@ -324,36 +392,44 @@ def install(home: Path, state_root: Path | None, name: str, activate: bool) -> N
         raise WorkbenchError(
             "installation requires --activate to confirm user-level file writes"
         )
-    after = source_files(name)
-    directory, manifest_path = installation_paths(home, state_root, name)
-    manifest = read_manifest(manifest_path, directory)
-    if manifest is None and directory.exists():
-        raise WorkbenchError(f"refusing to overwrite unmanaged path: {directory}")
-    before = installed_files(directory, manifest) if manifest else {}
-    for relative in after.keys() - before.keys():
-        target = directory / relative
-        reject_symlinks(target)
-        if target.exists():
-            raise WorkbenchError(f"refusing to overwrite unmanaged path: {target}")
-        for parent in target.parents:
-            if parent.exists() and not parent.is_dir():
-                raise WorkbenchError(f"file blocks destination folder: {parent}")
-    apply_files(directory, manifest_path, before, after)
-    print(f"Skills / {name}: installed at {directory}")
+    planned = []
+    for item in targets(home, state_root, name):
+        after = source_for(item, name)
+        manifest = read_manifest(item)
+        if manifest is None and unmanaged(item):
+            raise WorkbenchError(
+                f"refusing to overwrite unmanaged path: {item.directory}"
+            )
+        before = installed_files(item.directory, manifest) if manifest else {}
+        for relative in after.keys() - before.keys():
+            target = item.directory / relative
+            reject_symlinks(target)
+            if target.exists():
+                raise WorkbenchError(f"refusing to overwrite unmanaged path: {target}")
+            for parent in target.parents:
+                if parent.exists() and not parent.is_dir():
+                    raise WorkbenchError(f"file blocks destination folder: {parent}")
+        planned.append((item, before, after))
+    for item, before, after in planned:
+        apply_files(item, before, after)
+        print(f"{item.label}: installed at {item.directory}")
 
 
 def remove(home: Path, state_root: Path | None, name: str, confirm: bool) -> None:
     if not confirm:
         raise WorkbenchError("removal requires --confirm-removal")
-    directory, manifest_path = installation_paths(home, state_root, name)
-    manifest = read_manifest(manifest_path, directory)
-    if manifest is None:
+    planned = []
+    for item in targets(home, state_root, name):
+        manifest = read_manifest(item)
+        if manifest is not None:
+            planned.append((item, installed_files(item.directory, manifest)))
+    if not planned:
         raise WorkbenchError(f"no managed installation found for: {name}")
-    before = installed_files(directory, manifest)
-    apply_files(directory, manifest_path, before, {})
-    if directory.exists():
-        print(f"preserved user-added files in: {directory}")
-    print(f"Skills / {name}: removed managed files")
+    for item, before in planned:
+        apply_files(item, before, {})
+        if not item.shared and item.directory.exists():
+            print(f"preserved user-added files in: {item.directory}")
+        print(f"{item.label}: removed managed files")
 
 
 def git_value(workspace: Path, *arguments: str) -> str:
@@ -436,7 +512,7 @@ def show_handoff(home: Path, state_root: Path | None, name: str) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Install skills for VS Code Copilot and Claude Code (one shared folder), and manage private handoffs.",
+        description="Install skills and agents for VS Code Copilot and Claude Code, and manage private handoffs.",
     )
     parser.add_argument(
         "--home", type=Path, default=Path.home(), help=argparse.SUPPRESS
@@ -452,18 +528,22 @@ def build_parser() -> argparse.ArgumentParser:
         "status", help="report installations without writes"
     )
     status_parser.add_argument(
-        "skill", nargs="?", help="skill folder name; omit to list all known skills"
+        "skill", nargs="?", help="skill or agent name; omit to list everything known"
     )
     apply_parser = commands.add_parser(
-        "install", help="install/update one selected skill folder"
+        "install", help="install/update one skill folder or agent"
     )
-    apply_parser.add_argument("skill", help="folder name under .agents/skills/")
+    apply_parser.add_argument(
+        "skill", help="name under .agents/skills/ or .agents/agents/"
+    )
     apply_parser.add_argument(
         "--activate", action="store_true", help="confirm user-level file writes"
     )
-    remove_parser = commands.add_parser("remove", help="remove one managed skill")
+    remove_parser = commands.add_parser(
+        "remove", help="remove one managed skill or agent"
+    )
     remove_parser.add_argument(
-        "skill", help="installed skill name (source need not exist)"
+        "skill", help="installed skill or agent name (source need not exist)"
     )
     remove_parser.add_argument("--confirm-removal", action="store_true")
 

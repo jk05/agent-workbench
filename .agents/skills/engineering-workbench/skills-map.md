@@ -17,7 +17,7 @@ skill from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
 | debug | `systematic-debugging` | Superpowers |
 | comments | `lean-comments` | awesome-copilot |
 | simplify | `code-simplification` | Addy Osmani |
-| review | `requesting-code-review` | Superpowers |
+| review | `requesting-code-review`, then `workbench-reviewer` | Superpowers |
 | receive-review | `receiving-code-review` | Superpowers |
 | verify | `verification-before-completion` | Superpowers |
 | deliver, CI to green | this workbench: [delivery.md](delivery.md) | workbench |
@@ -33,5 +33,8 @@ skill from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
   `superpowers:<name>`.
 - **`lean-comments` and `code-simplification`** are copied into this repo at
   a pinned commit (see each `NOTICE.md`) and installed with the workbench.
+- **`workbench-reviewer`** is this repo's read-only agent (`.agents/agents/`),
+  installed for both runtimes. Its name avoids clashing with project agents
+  such as a repo's own `reviewer`.
 - Install only the mapped `test-driven-development` (Superpowers). Addy's pack
   ships one with the same name; installing the whole pack makes them compete.

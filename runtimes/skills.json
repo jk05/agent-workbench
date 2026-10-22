@@ -1,5 +1,0 @@
-{
-  "schema_version": 2,
-  "runtimes": ["copilot", "claude-code"],
-  "personal_skills_directory": ".claude/skills"
-}

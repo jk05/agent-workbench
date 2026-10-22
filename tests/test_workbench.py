@@ -1,4 +1,4 @@
-"""Shared skill installer and handoff mechanics, using synthetic skills and fixtures."""
+"""Skill/agent installer and handoff mechanics, using synthetic sources and fixtures."""
 
 import importlib.util
 import json
@@ -18,7 +18,7 @@ workbench = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(workbench)
 
 
-class SkillInstallerTests(unittest.TestCase):
+class InstallerFixture(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
@@ -31,13 +31,20 @@ class SkillInstallerTests(unittest.TestCase):
         self.addCleanup(patch.stopall)
         patch.object(workbench, "SKILLS_ROOT", self.sources).start()
         patch.object(workbench, "REPOSITORY_ROOT", self.root).start()
+        self.agents = self.root / "agents"
+        self.agents.mkdir()
+        patch.object(workbench, "AGENTS_ROOT", self.agents).start()
         (self.root / "runtimes").mkdir()
-        (self.root / "runtimes/skills.json").write_text(
+        (self.root / "runtimes/wiring.json").write_text(
             json.dumps(
                 {
-                    "schema_version": 2,
+                    "schema_version": 3,
                     "runtimes": ["copilot", "claude-code"],
                     "personal_skills_directory": ".claude/skills",
+                    "personal_agents_directories": {
+                        "copilot": ".copilot/agents",
+                        "claude-code": ".claude/agents",
+                    },
                 }
             )
         )
@@ -72,6 +79,8 @@ class SkillInstallerTests(unittest.TestCase):
     def remove(self, name="example-one"):
         workbench.remove(self.home, self.state, name, True)
 
+
+class SkillInstallerTests(InstallerFixture):
     def test_status_is_read_only_and_install_requires_approval(self):
         self.assertEqual(workbench.status(self.home, self.state, None), 0)
         with self.assertRaisesRegex(workbench.WorkbenchError, "--activate"):
@@ -274,6 +283,60 @@ class SkillInstallerTests(unittest.TestCase):
         with self.assertRaisesRegex(workbench.WorkbenchError, "legacy"):
             self.install()
         self.assertEqual(legacy.read_text(), '{"version": 1}')
+
+
+class AgentInstallerTests(InstallerFixture):
+    def setUp(self):
+        super().setUp()
+        (self.agents / "reviewer.md").write_text(
+            "---\nname: reviewer\ndescription: Reviews diffs.\n---\n\nReview.\n"
+        )
+        self.copies = [
+            self.home / ".copilot/agents/reviewer.md",
+            self.home / ".claude/agents/reviewer.md",
+        ]
+
+    def test_agent_installs_identical_copies_and_keeps_other_agents(self):
+        other = self.home / ".claude/agents/mine.md"
+        other.parent.mkdir(parents=True)
+        other.write_text("user agent")
+        workbench.install(self.home, self.state, "reviewer", True)
+        source = (self.agents / "reviewer.md").read_bytes()
+        self.assertTrue(all(copy.read_bytes() == source for copy in self.copies))
+        with patch("builtins.print") as printed:
+            workbench.status(self.home, self.state, "reviewer")
+        lines = [call.args[0] for call in printed.call_args_list]
+        self.assertEqual(len(lines), 2)
+        self.assertTrue(all(line.endswith("installed and in sync") for line in lines))
+        workbench.remove(self.home, self.state, "reviewer", True)
+        self.assertFalse(any(copy.exists() for copy in self.copies))
+        self.assertEqual(other.read_text(), "user agent")
+        self.assertTrue((self.home / ".copilot/agents").is_dir())
+
+    def test_unmanaged_agent_file_blocks_install_without_writes(self):
+        self.copies[1].parent.mkdir(parents=True)
+        self.copies[1].write_text("someone else's reviewer")
+        with self.assertRaisesRegex(workbench.WorkbenchError, "unmanaged"):
+            workbench.install(self.home, self.state, "reviewer", True)
+        self.assertFalse(self.copies[0].exists())
+        self.assertEqual(self.copies[1].read_text(), "someone else's reviewer")
+
+    def test_edited_agent_copy_blocks_update(self):
+        workbench.install(self.home, self.state, "reviewer", True)
+        self.copies[0].write_text("edited")
+        (self.agents / "reviewer.md").write_text(
+            "---\nname: reviewer\ndescription: Updated.\n---\n"
+        )
+        with self.assertRaisesRegex(workbench.WorkbenchError, "locally edited"):
+            workbench.install(self.home, self.state, "reviewer", True)
+        self.assertEqual(self.copies[0].read_text(), "edited")
+
+    def test_name_cannot_be_both_skill_and_agent(self):
+        (self.agents / "example-one.md").write_text(
+            "---\nname: example-one\ndescription: Clash.\n---\n"
+        )
+        with self.assertRaisesRegex(workbench.WorkbenchError, "both a skill and"):
+            workbench.status(self.home, self.state, "example-one")
 
 
 class HandoffAndCliTests(unittest.TestCase):
