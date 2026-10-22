@@ -1,0 +1,51 @@
+# Delivery: draft PR to green CI
+
+Read this when committing, pushing, opening or updating a PR, watching CI,
+handling review feedback, or working on more than one PR.
+
+## Permissions
+
+Commit, push, draft PR creation or update, public replies, and marking ready
+are distinct actions. An approved delivery sequence covers the actions it
+names; do not ask again for each. Without publication approval, leave the
+validated local changes and a draft PR description in the response.
+
+## The CI-to-green loop
+
+1. Follow workspace branch, base, and title conventions. Check whether a PR
+   already exists for the branch; never create a duplicate. Push, then create
+   or update the **draft** PR with a concise, evidence-based description.
+2. Confirm the PR head matches the intended commit. Associate every check
+   result with that SHA; results for an older SHA are not readiness evidence.
+   Watch for a bounded time (e.g. `gh pr checks <pr> --watch`), never forever.
+3. On failure, read the logs (e.g. `gh run view <run-id> --log-failed`) and
+   separate pre-existing or environment failures from regressions.
+4. Fix in-scope failures locally, rerun the local checks, push, and watch again.
+   Before every push, inspect the diff for anything that weakens the quality
+   floor in [SKILL.md](SKILL.md); if present, stop and report.
+5. Stop when CI is green, after two failed repairs with the same root cause, or
+   when the agreed time budget runs out. Report the PR, head SHA, pending,
+   skipped, failed, and unavailable checks, unresolved threads, and next action.
+
+Never mark ready or merge without explicit approval and evidence that meets
+workspace readiness rules.
+
+## Review feedback
+
+Judge each comment against the approved scope. Fix in-scope issues with the
+same repair bound. Escalate conflicting, consequential, or out-of-scope
+requests, and never remove a regression test because a comment asks to.
+Post replies only when permitted and under workspace disclosure policy.
+
+## More than one PR
+
+- While a PR waits for review, continue other approved, independent slices in
+  isolated branches or worktrees.
+- A slice that depends on an unmerged PR needs an agreed base strategy
+  (stacked or wait). Do not stack silently or merge to unblock it.
+- When a prerequisite changes, recheck dependants; their earlier results are stale.
+- Report each PR's base, head, CI, unresolved threads, and dependencies
+  separately; mark missing state as unknown.
+- If a slice grows, revisit its boundary and seek approval before changing
+  scope or base strategy. Waiting is not permission to merge, expand scope,
+  or launch parallel agents.

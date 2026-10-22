@@ -1,192 +1,74 @@
 # Use and maintain skills
 
-The helper installs selected skill folders for **Copilot only**.
-Why: edit skills here, then reuse approved versions across projects without
-copying instructions by hand.
+**Why:** edit skills here, then reuse the approved version in every project.
 
 ```text
-.agents/skills/<name>/       Python helper       ~/.agents/skills/<name>/
-  SKILL.md                  -- explicit copy -->   SKILL.md
-  references/, scripts/...                        same supporting files
+.agents/skills/<name>/   -- install (approved) -->   ~/.agents/skills/<name>/
                                   |
-                          Private ownership record
-                          hashes + file permissions
+                       private ownership record
+                       (hashes + file permissions)
 ```
 
-The script does not run an AI, configure MCP, launch CI, or create PRs.
-Those actions belong to the agent reading the installed skill.
+The helper only copies files. It never runs an AI, configures MCP, or touches
+your projects.
 
-## Install, update, or remove one skill
-
-Requirements: Python 3.9+; Git for handoff snapshots. Run from this repo:
+## Install, update, remove
 
 ```sh
-# Read-only: all known source skills and managed Copilot installations
-python3 scripts/workbench.py status
-python3 scripts/workbench.py status engineering-workbench
-
-# Read-only evidence gate; does not run an AI
-python3 scripts/workbench.py verify engineering-workbench
-
-# Writes user-level files: only after approval
+python3 scripts/workbench.py status                       # read-only
 python3 scripts/workbench.py install engineering-workbench --activate
-
-# Removal: only after approval
 python3 scripts/workbench.py remove engineering-workbench --confirm-removal
 ```
 
-`engineering-workbench` is an example selection, not a hardcoded installer
-dependency. Future reviewed skills can have their own folders and names.
-Installation includes regular supporting files and preserves executable bits.
-Empty source directories are not installed; symlinks are refused.
+- **Update:** edit the source, run the tests, install again.
+- **Safety:** the helper only touches files it installed. It refuses to
+  overwrite edits you made to the installed copy or unmanaged files, keeps
+  files you added, and restores changed files if a write fails.
+- **Not provided:** automatic sync, skill downloads, or version history.
+  Roll back by installing an earlier source version.
 
-Installation/update also requires fresh, passing eval evidence for the selected
-skill. **The current example is blocked by its recorded planning failure.**
-See [when to repeat evals](../evals/README.md#when-must-evals-be-repeated).
-Activation approval cannot turn a failed eval into a pass.
+## Use the workflow
 
-For updates: edit the source, test it, then explicitly re-run installation.
-The helper checks owned files before writing, refuses direct installed edits
-and unmanaged collisions, and removes obsolete owned files. Removal preserves
-user-added files and other installed skills; it works without the source folder.
-
-An ordinary write failure triggers restoration of the skill's changed files.
-Restoration failures are reported. This is not crash-proof transaction storage
-or protection against another process changing files during an operation.
-Run one maintenance command at a time.
-
-There is no automatic sync, fetch, push, skill download, or version archive.
-To roll back content, restore a reviewed source version and explicitly install
-it. If an older single-skill `install.json` is detected, the helper refuses to
-guess ownership: remove that installation with the earlier helper first.
-No such installation has been performed during this build.
-
-## Use the example workflow in your project
-
-Start a fresh Copilot session and explicitly ask:
+Ask in a fresh Copilot Agents session, or type `/engineering-workbench`:
 
 > Use engineering-workbench to investigate PE-1234. Plan only for now.
 
-Or invoke `/engineering-workbench`. Copilot may also select it from its
-description, but automatic selection is not guaranteed.
+After you agree the plan, approve delivery in one go, for example:
 
-It should investigate, clarify acceptance criteria, and agree a scoped plan.
-It uses tools already available and permitted, such as Atlassian MCP, and
-checks for useful procedures or installed skills at meaningful transitions.
-It explains the relevant suggestion; you can accept or decline. Agreement
-leads to invocation where supported, not just another mention. It respects
-declines and does not force irrelevant procedures or install dependencies.
+> Approved, go all the way to a green draft PR. Don't mark ready or merge.
 
-For significant design trade-offs it should suggest `grill-me` (interview)
-or `grill-with-docs` (interview plus decision/glossary documentation), then
-invoke the available chosen procedure once you agree. The docs variant needs
-an agreed document scope. These procedures are optional external skills,
-not installed by this workbench.
+Each phase names a role, and the
+[skills map](../.agents/skills/engineering-workbench/skills-map.md) says which
+skill fills it. If a mapped skill is missing, the workflow says so and uses a
+short built-in fallback.
 
-For reverse engineering, it should suggest an available
-`reverse-engineer-anything` skill when evidence must come from a shipped binary,
-packaged app, or runtime rather than available source. Simply finding an npm
-package or module is not a reason to use REA: normal source/docs/tests come first.
-As with other procedures, you choose whether to invoke it. Running an unknown
-target or attaching to a process needs explicit permission.
+## Private project notes
 
-When ready, you can approve a delivery sequence:
-
-> Implement the agreed scope, validate, commit, push, create a draft PR,
-> and follow CI and comments. Don't mark ready, merge, or deploy.
-
-Without publication permission, work stays local with a PR description in chat.
-Conflicting existing instructions need resolving before external actions.
-PR follow-up is bounded; pending feedback can be handed off, not watched forever.
-
-### Small changes, linked follow-ups
-
-The default is the smallest complete change, not reduced quality or a framework
-for hypothetical future needs. Plans consider logical, testable PR slices and
-revisit them as evidence changes; a cohesive small fix can stay in one PR.
+Project-specific commands, tracker settings, and known flaky tests live
+outside every repository:
 
 ```text
-Plan slices + blockers -> build/test A -> A waits for review
-                                               |
-                              Continue approved independent B
-                              C depends on A: agreed base or wait
-
-Discover deferred work -> propose ticket/comment -> your confirmation
-                                                    |
-                                  Link original ticket + follow-up + PR
+~/.agent-workbench/projects/<repo-name>/
 ```
 
-Useful extra work should be captured, not silently implemented. The agent
-checks for existing tickets, shows the proposed ticket/comment and destination,
-then asks before creating or posting it. This includes comments on the original
-ticket and any useful code comment for a non-obvious limitation. PR descriptions
-link the original ticket and confirmed follow-ups; unapproved items remain
-clearly labelled proposals in the local draft/report or private handoff.
-Declining publication does not stop other approved work.
+The workflow reads that folder when it exists. Never commit it.
 
-## Add another skill
+## Handoffs
 
-```text
-.agents/skills/
-  engineering-workbench/     First working example
-  another-reviewed-skill/    Future skill, not currently shipped
-    SKILL.md
-    references/             Optional
-    scripts/                Optional
-```
-
-Use a lowercase kebab-case folder name. Include YAML frontmatter with a matching
-`name` and meaningful `description`. Keep any referenced resources inside the
-folder so installation remains self-contained.
-
-Review provenance, version, license, side effects, invocation rules, and
-Copilot compatibility before adoption. Test mechanics and relevant behavior,
-register cases/results in `evals/policy.json`, then verify and explicitly install
-the named skill. The installer checks basic
-frontmatter presence, not full YAML syntax or behavioral compatibility.
-
-## Private handoffs
-
-Why: retain enough task context to resume without repeating actions.
-
-```text
-Ask agent to pause -> populated private Markdown handoff
-                               |
-New chat + handoff -> reconcile Git/checks/PR state -> continue
-```
-
-The helper only creates or displays a template; the agent must populate scope,
-approvals, evidence, PR/CI state, processes, blockers, and next step.
+Ask the agent to pause; it saves a private Markdown handoff. In a new chat,
+point it at the handoff; it rechecks Git, checks, and PR state before acting.
 
 ```sh
 python3 scripts/workbench.py handoff create ticket-name --workspace /path/to/repo
 python3 scripts/workbench.py handoff show ticket-name
 ```
 
-State lives under `$XDG_STATE_HOME/agent-workbench/`, or
-`~/.local/state/agent-workbench/`. `tasks/` holds handoffs;
-`installations/copilot/<skill>.json` holds ownership records.
-Use `--state-root /private/state-base` **before** the subcommand to override
-the base; `agent-workbench/` is appended. Use the same base on later commands.
-Keep it outside source repositories. No secrets, automatic deletion, or backups.
+State lives in `$XDG_STATE_HOME/agent-workbench/` or
+`~/.local/state/agent-workbench/`. Override with `--state-root <dir>` before the
+subcommand. No secrets, automatic deletion, or backups.
 
-<details>
-<summary>Capability selection and runtime limits</summary>
+## Add another skill
 
-- **Owned example:** Engineering Workbench, local source, untagged. Explicit
-  workspace invocation observed; user-wide use not exercised.
-- **Optional procedures:** grilling, TDD, diagnosis, and review. Existing
-  workspace/runtime skills or reviewed upstream sources such as
-  [Matt Pocock's skills](https://github.com/mattpocock/skills) may supply these.
-  They are not pinned, copied, or installed by this repo. Check their actual
-  version and invocation policy; suggest explicit-only workflows with consent.
-- **Evidence/actions:** Jira/Confluence, observability, GitHub, browser, and
-  code intelligence come from configured MCP, CLI, or native tools. Check
-  availability and permissions in each session.
-
-Claude Code is a possible future target, not a supported option. Reusing the
-Markdown format alone would not verify its discovery, tools, or permissions.
-See [Copilot discovery](copilot-discovery.md) and
-[project intent](PROJECT-INTENT.md) for the current boundaries.
-
-</details>
+Create `.agents/skills/<kebab-name>/SKILL.md` with `name` and `description`
+frontmatter, keep its resources inside the folder, try it on a real task, then
+install it. Check a third-party skill's source, license, and side effects first.

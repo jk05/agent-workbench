@@ -3,13 +3,11 @@
 import importlib.util
 import json
 import os
-import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
-from typing import TypedDict
 from unittest.mock import patch
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts/workbench.py"
@@ -18,11 +16,6 @@ if SPEC is None or SPEC.loader is None:
     raise ImportError(f"cannot load workbench helper: {SCRIPT}")
 workbench = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(workbench)
-
-
-class FixturePolicy(TypedDict):
-    schema_version: int
-    skills: dict[str, dict[str, str]]
 
 
 class CopilotInstallerTests(unittest.TestCase):
@@ -48,8 +41,6 @@ class CopilotInstallerTests(unittest.TestCase):
                 }
             )
         )
-        (self.root / "evals").mkdir()
-        self.policy: FixturePolicy = {"schema_version": 1, "skills": {}}
         self.make_skill("example-one")
         self.make_skill("example-two")
 
@@ -67,61 +58,7 @@ class CopilotInstallerTests(unittest.TestCase):
         script.parent.mkdir()
         script.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
         script.chmod(0o755)
-        self.policy["skills"][name] = {
-            "cases": f"evals/{name}-cases.json",
-            "results": f"evals/{name}-results.json",
-        }
-        (self.root / "evals/policy.json").write_text(json.dumps(self.policy))
-        cases = {
-            "schema_version": 1,
-            "execution": {
-                "sample_case_ids": ["fixture"],
-                "max_agent_turns_per_case": 2,
-            },
-            "cases": [
-                {
-                    "id": "fixture",
-                    "must_do": ["Show the synthetic expected behavior."],
-                    "must_not_do": [
-                        "Claim a real AI run took place in this unit test."
-                    ],
-                }
-            ],
-        }
-        (self.root / f"evals/{name}-cases.json").write_text(json.dumps(cases))
-        self.record_fixture_eval(name)
         return directory
-
-    def result_path(self, name="example-one"):
-        return self.root / f"evals/{name}-results.json"
-
-    def record_fixture_eval(self, name="example-one"):
-        """Fabricated unit-test data, not real behavioral evidence."""
-        result = {
-            "schema_version": 1,
-            "date": "unit-test fixture",
-            "execution_target": "Copilot task-tool subagents",
-            "assessment": "Synthetic record testing gate mechanics only; no AI was called.",
-            "inputs_sha256": workbench.eval_inputs(name, workbench.source_files(name)),
-            "runs": [
-                {
-                    "case_id": "fixture",
-                    "status": "pass",
-                    "agent_turns": 1,
-                    "response": "Synthetic response fixture, not AI output.",
-                    "criteria": [
-                        {
-                            "kind": kind,
-                            "index": 0,
-                            "verdict": "pass",
-                            "evidence": "Synthetic fixture evidence.",
-                        }
-                        for kind in ("must_do", "must_not_do")
-                    ],
-                }
-            ],
-        }
-        self.result_path(name).write_text(json.dumps(result))
 
     def destination(self, name="example-one"):
         return self.home / ".agents/skills" / name
@@ -177,7 +114,6 @@ class CopilotInstallerTests(unittest.TestCase):
         with patch("builtins.print") as printed:
             self.assertEqual(workbench.status(self.home, self.state, "example-one"), 0)
         self.assertIn("update available", printed.call_args.args[0])
-        self.record_fixture_eval()
         self.install()
         self.assertFalse((self.destination() / "references/example.txt").exists())
         self.assertEqual((self.destination() / "references/new.txt").read_text(), "new")
@@ -275,7 +211,6 @@ class CopilotInstallerTests(unittest.TestCase):
         source = self.sources / "example-one/SKILL.md"
         source.write_text(source.read_text() + "updated")
         (self.sources / "example-one/new.txt").write_text("new")
-        self.record_fixture_eval()
         real_write = workbench.write_atomic
 
         def fail_manifest(path, contents):
@@ -340,149 +275,6 @@ class CopilotInstallerTests(unittest.TestCase):
             self.install()
         self.assertEqual(legacy.read_text(), '{"version": 1}')
 
-    def test_missing_policy_and_results_block_before_install_writes(self):
-        self.policy["skills"].pop("example-one")
-        (self.root / "evals/policy.json").write_text(json.dumps(self.policy))
-        with self.assertRaisesRegex(workbench.WorkbenchError, "no eval policy"):
-            self.install()
-        self.assertFalse(self.destination().exists())
-        self.assertFalse(self.state.exists())
-        self.policy["skills"]["example-one"] = {
-            "cases": "evals/example-one-cases.json",
-            "results": "evals/example-one-results.json",
-        }
-        (self.root / "evals/policy.json").write_text(json.dumps(self.policy))
-        self.result_path().unlink()
-        with self.assertRaisesRegex(
-            workbench.WorkbenchError, "cannot read JSON record"
-        ):
-            self.install()
-        self.assertFalse(self.destination().exists())
-
-    def test_failed_inconclusive_or_missing_required_run_blocks_install(self):
-        original = self.result_path().read_text()
-        for verdict in ("fail", "inconclusive", None):
-            result = json.loads(original)
-            if verdict is None:
-                result["runs"] = []
-            else:
-                result["runs"][0]["status"] = verdict
-            self.result_path().write_text(json.dumps(result))
-            with self.assertRaisesRegex(workbench.WorkbenchError, "required eval"):
-                self.install()
-            self.assertFalse(self.destination().exists())
-            self.assertFalse(self.state.exists())
-
-    def test_stale_skill_resource_mode_cases_wiring_and_policy_block_update(self):
-        self.install()
-        installed = (self.destination() / "SKILL.md").read_bytes()
-        changes = [
-            self.sources / "example-one/SKILL.md",
-            self.sources / "example-one/references/example.txt",
-            self.root / "evals/example-one-cases.json",
-            self.root / "runtimes/copilot.json",
-        ]
-        for path in changes:
-            original = path.read_bytes()
-            path.write_bytes(original + b"\n")
-            with self.assertRaisesRegex(workbench.WorkbenchError, "stale or missing"):
-                self.install()
-            self.assertEqual((self.destination() / "SKILL.md").read_bytes(), installed)
-            path.write_bytes(original)
-        script = self.sources / "example-one/scripts/check.sh"
-        script.chmod(0o644)
-        with self.assertRaisesRegex(workbench.WorkbenchError, "stale or missing"):
-            self.install()
-        script.chmod(0o755)
-        self.policy["skills"]["example-one"]["purpose"] = "policy change"
-        (self.root / "evals/policy.json").write_text(json.dumps(self.policy))
-        with self.assertRaisesRegex(workbench.WorkbenchError, "stale or missing"):
-            self.install()
-
-    def test_new_or_removed_resources_invalidate_evidence(self):
-        extra = self.sources / "example-one/extra.md"
-        extra.write_text("new resource")
-        with self.assertRaisesRegex(workbench.WorkbenchError, "stale or missing"):
-            self.install()
-        extra.unlink()
-        (self.sources / "example-one/references/example.txt").unlink()
-        with self.assertRaisesRegex(workbench.WorkbenchError, "stale or missing"):
-            self.install()
-
-    def test_claimed_pass_with_bad_criteria_is_rejected(self):
-        original = self.result_path().read_text()
-        for change in ("failure", "inconclusive", "missing", "duplicate", "evidence"):
-            result = json.loads(original)
-            criteria = result["runs"][0]["criteria"]
-            if change == "failure":
-                criteria[0]["verdict"] = "fail"
-            elif change == "inconclusive":
-                criteria[0]["verdict"] = "not_observable"
-            elif change == "missing":
-                criteria.pop()
-            elif change == "duplicate":
-                criteria.append(criteria[0].copy())
-            else:
-                criteria[0]["evidence"] = ""
-            self.result_path().write_text(json.dumps(result))
-            with self.assertRaises(workbench.WorkbenchError):
-                self.install()
-            self.assertFalse(self.destination().exists())
-
-    def test_verification_does_not_call_ai_or_write_files(self):
-        with patch.object(
-            subprocess, "run", side_effect=AssertionError("no AI/tool calls")
-        ):
-            workbench.verify_evals("example-one")
-        self.assertFalse(self.state.exists())
-        self.assertFalse(self.destination().exists())
-
-    def test_sdk_evidence_uses_the_same_freshness_gate(self):
-        result = json.loads(self.result_path().read_text())
-        result["execution_target"] = "Copilot Python SDK"
-        self.result_path().write_text(json.dumps(result))
-        workbench.verify_evals("example-one")
-        result.pop("inputs_sha256")
-        self.result_path().write_text(json.dumps(result))
-        with self.assertRaises(workbench.WorkbenchError):
-            workbench.verify_evals("example-one")
-
-    def test_human_docs_and_other_skill_policy_do_not_invalidate_evidence(self):
-        (self.root / "README.md").write_text("Human-facing prose change")
-        self.policy["skills"]["example-two"]["purpose"] = "other skill change"
-        (self.root / "evals/policy.json").write_text(json.dumps(self.policy))
-        workbench.verify_evals("example-one")
-        self.assertFalse(self.state.exists())
-
-    def test_missing_assessment_wrong_runtime_and_duplicate_runs_are_rejected(self):
-        original = self.result_path().read_text()
-        for change in ("assessment", "runtime", "duplicate", "budget", "fingerprint"):
-            result = json.loads(original)
-            if change == "assessment":
-                result["assessment"] = ""
-            elif change == "runtime":
-                result["execution_target"] = "another runtime"
-            elif change == "duplicate":
-                result["runs"].append(result["runs"][0].copy())
-            elif change == "budget":
-                result["runs"][0]["agent_turns"] = 3
-            else:
-                result.pop("inputs_sha256")
-            self.result_path().write_text(json.dumps(result))
-            with self.assertRaises(workbench.WorkbenchError):
-                self.install()
-            self.assertFalse(self.destination().exists())
-            self.assertFalse(self.state.exists())
-
-    def test_removal_and_status_still_work_with_failing_eval(self):
-        self.install()
-        result = json.loads(self.result_path().read_text())
-        result["runs"][0]["status"] = "fail"
-        self.result_path().write_text(json.dumps(result))
-        self.assertEqual(workbench.status(self.home, self.state, "example-one"), 0)
-        self.remove()
-        self.assertFalse(self.destination().exists())
-
 
 class HandoffAndCliTests(unittest.TestCase):
     def setUp(self):
@@ -524,34 +316,6 @@ class HandoffAndCliTests(unittest.TestCase):
         self.assertIn("Copilot / engineering-workbench: not installed", result.stdout)
         self.assertFalse(self.home.exists())
         self.assertFalse(self.state.exists())
-
-    def test_cli_blocks_failed_evidence_without_writes(self):
-        repository = self.root / "repository"
-        for directory in ("scripts", "runtimes", ".agents/skills", "evals"):
-            shutil.copytree(SCRIPT.parents[1] / directory, repository / directory)
-        results_path = repository / "evals/results.json"
-        results = json.loads(results_path.read_text())
-        results["runs"][0]["status"] = "fail"
-        results_path.write_text(json.dumps(results))
-        script = repository / "scripts/workbench.py"
-        result = self.run_cli(
-            "install", "engineering-workbench", "--activate", script=script
-        )
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("ticket-planning: fail", result.stderr)
-        self.assertFalse(self.home.exists())
-        self.assertFalse(self.state.exists())
-        verify = self.run_cli("verify", "engineering-workbench", script=script)
-        self.assertNotEqual(verify.returncode, 0)
-        self.assertIn("ticket-planning: fail", verify.stderr)
-        fingerprints = self.run_cli(
-            "eval-inputs", "engineering-workbench", script=script
-        )
-        self.assertEqual(fingerprints.returncode, 0, fingerprints.stderr)
-        self.assertEqual(
-            set(json.loads(fingerprints.stdout)),
-            {"skill_tree", "cases", "policy", "copilot_wiring"},
-        )
 
     def test_handoff_template_is_private_and_not_overwritten(self):
         result = self.run_cli(

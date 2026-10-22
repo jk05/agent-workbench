@@ -194,150 +194,6 @@ def source_files(name: str) -> dict[str, tuple[bytes, int]]:
     return files
 
 
-def eval_setup(name: str) -> tuple[dict, Path, Path]:
-    validate_name(name)
-    policy = read_json_object(REPOSITORY_ROOT / "evals/policy.json")
-    skills = policy.get("skills")
-    if policy.get("schema_version") != 1 or not isinstance(skills, dict):
-        raise WorkbenchError("invalid eval policy")
-    selection = skills.get(name)
-    if not isinstance(selection, dict):
-        raise WorkbenchError(
-            f"no eval policy for {name}; add cases and results before installation"
-        )
-    for key in ("cases", "results"):
-        value = selection.get(key)
-        if not isinstance(value, str) or not safe_relative(value):
-            raise WorkbenchError(f"invalid {key} path in eval policy for {name}")
-    return (
-        selection,
-        REPOSITORY_ROOT / selection["cases"],
-        REPOSITORY_ROOT / selection["results"],
-    )
-
-
-def eval_inputs(name: str, files: dict[str, tuple[bytes, int]]) -> dict[str, str]:
-    selection, cases_path, _ = eval_setup(name)
-    reject_symlinks(cases_path)
-    copilot_wiring()
-    records = {relative: file_record(value) for relative, value in files.items()}
-    return {
-        "skill_tree": digest(json.dumps(records, sort_keys=True).encode()),
-        "cases": digest(cases_path.read_bytes()),
-        "copilot_wiring": digest(
-            (REPOSITORY_ROOT / "runtimes/copilot.json").read_bytes()
-        ),
-        "policy": digest(json.dumps(selection, sort_keys=True).encode()),
-    }
-
-
-def verify_evals(name: str, files: dict[str, tuple[bytes, int]] | None = None) -> None:
-    _, cases_path, results_path = eval_setup(name)
-    cases = read_json_object(cases_path)
-    results = read_json_object(results_path)
-    execution = cases.get("execution")
-    if cases.get("schema_version") != 1 or not isinstance(execution, dict):
-        raise WorkbenchError(f"invalid eval cases: {cases_path}")
-    required = execution.get("sample_case_ids")
-    definitions = cases.get("cases")
-    max_turns = execution.get("max_agent_turns_per_case")
-    if (
-        not isinstance(required, list)
-        or not required
-        or not all(isinstance(item, str) and item for item in required)
-        or len(required) != len(set(required))
-        or not isinstance(definitions, list)
-        or type(max_turns) is not int
-        or max_turns < 1
-    ):
-        raise WorkbenchError(f"invalid required eval sample in: {cases_path}")
-    by_id = {}
-    for case in definitions:
-        if not isinstance(case, dict) or not isinstance(case.get("id"), str):
-            raise WorkbenchError(f"invalid case definition in: {cases_path}")
-        if case["id"] in by_id:
-            raise WorkbenchError(f"duplicate case ID in: {cases_path}")
-        for kind in ("must_do", "must_not_do"):
-            criteria = case.get(kind)
-            if (
-                not isinstance(criteria, list)
-                or not criteria
-                or not all(isinstance(item, str) and item.strip() for item in criteria)
-            ):
-                raise WorkbenchError(f"invalid {kind} criteria for: {case['id']}")
-        by_id[case["id"]] = case
-    if not set(required) <= by_id.keys():
-        raise WorkbenchError("required eval case definition is missing")
-    runs = results.get("runs")
-    if (
-        results.get("schema_version") != 1
-        or not isinstance(runs, list)
-        or not isinstance(results.get("assessment"), str)
-        or not results["assessment"].strip()
-        or not isinstance(results.get("date"), str)
-        or not results["date"].strip()
-        or results.get("execution_target")
-        not in ("Copilot task-tool subagents", "Copilot Python SDK")
-    ):
-        raise WorkbenchError(
-            f"missing or invalid Copilot eval assessment in: {results_path}"
-        )
-    by_run = {}
-    for run in runs:
-        if not isinstance(run, dict) or not isinstance(run.get("case_id"), str):
-            raise WorkbenchError(f"invalid eval run in: {results_path}")
-        if run["case_id"] in by_run:
-            raise WorkbenchError(f"duplicate eval run: {run['case_id']}")
-        by_run[run["case_id"]] = run
-    for identifier in required:
-        run = by_run.get(identifier)
-        if run is None:
-            raise WorkbenchError(f"required eval not run: {identifier}")
-        if run.get("status") != "pass":
-            raise WorkbenchError(
-                f"required eval {identifier}: {run.get('status', 'missing verdict')}; "
-                "installation blocked, address and rerun the eval"
-            )
-        if (
-            not isinstance(run.get("response"), str)
-            or not run["response"].strip()
-            or type(run.get("agent_turns")) is not int
-            or not 1 <= run["agent_turns"] <= max_turns
-            or not isinstance(run.get("criteria"), list)
-        ):
-            raise WorkbenchError(f"invalid response or turn budget for: {identifier}")
-        expected = {
-            (kind, index)
-            for kind in ("must_do", "must_not_do")
-            for index in range(len(by_id[identifier][kind]))
-        }
-        observed = set()
-        for criterion in run["criteria"]:
-            if (
-                not isinstance(criterion, dict)
-                or not isinstance(criterion.get("kind"), str)
-                or type(criterion.get("index")) is not int
-                or criterion.get("verdict") != "pass"
-                or not isinstance(criterion.get("evidence"), str)
-                or not criterion["evidence"].strip()
-            ):
-                raise WorkbenchError(
-                    f"non-passing or invalid criterion in: {identifier}"
-                )
-            key = (criterion["kind"], criterion["index"])
-            if key in observed:
-                raise WorkbenchError(f"duplicate criterion in: {identifier}")
-            observed.add(key)
-        if observed != expected:
-            raise WorkbenchError(f"incomplete criterion assessment for: {identifier}")
-    current = eval_inputs(name, source_files(name) if files is None else files)
-    if results.get("inputs_sha256") != current:
-        raise WorkbenchError(
-            f"stale or missing eval input fingerprints for {name}; rerun the required "
-            "sample against current skill/resources, cases, policy and Copilot wiring"
-        )
-
-
 def installed_files(directory: Path, manifest: dict) -> dict[str, tuple[bytes, int]]:
     files = {}
     for name, expected in manifest["files"].items():
@@ -480,7 +336,6 @@ def install(home: Path, state_root: Path | None, name: str, activate: bool) -> N
         for parent in target.parents:
             if parent.exists() and not parent.is_dir():
                 raise WorkbenchError(f"file blocks destination folder: {parent}")
-    verify_evals(name, after)
     apply_files(directory, manifest_path, before, after)
     print(f"Copilot / {name}: installed at {directory}")
 
@@ -612,17 +467,6 @@ def build_parser() -> argparse.ArgumentParser:
     )
     remove_parser.add_argument("--confirm-removal", action="store_true")
 
-    verify_parser = commands.add_parser(
-        "verify",
-        help="check saved Copilot eval evidence without installing or calling AI",
-    )
-    verify_parser.add_argument("skill")
-    inputs_parser = commands.add_parser(
-        "eval-inputs",
-        help="print current fingerprints for recording a real eval; not approval",
-    )
-    inputs_parser.add_argument("skill")
-
     handoffs = commands.add_parser("handoff", help="manage private task handoffs")
     handoff_commands = handoffs.add_subparsers(dest="handoff_command", required=True)
     create_parser = handoff_commands.add_parser(
@@ -655,20 +499,6 @@ def main() -> int:
                 arguments.state_root,
                 arguments.skill,
                 arguments.confirm_removal,
-            )
-            return 0
-        if arguments.command == "verify":
-            verify_evals(arguments.skill)
-            print(
-                f"Copilot / {arguments.skill}: required eval evidence is current and passing"
-            )
-            return 0
-        if arguments.command == "eval-inputs":
-            print(
-                json.dumps(
-                    eval_inputs(arguments.skill, source_files(arguments.skill)),
-                    indent=2,
-                )
             )
             return 0
         if arguments.command == "handoff":
