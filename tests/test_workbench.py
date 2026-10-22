@@ -1,4 +1,4 @@
-"""Copilot installer and handoff mechanics, using synthetic skills and private fixtures."""
+"""Shared skill installer and handoff mechanics, using synthetic skills and fixtures."""
 
 import importlib.util
 import json
@@ -18,7 +18,7 @@ workbench = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(workbench)
 
 
-class CopilotInstallerTests(unittest.TestCase):
+class SkillInstallerTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
@@ -32,12 +32,12 @@ class CopilotInstallerTests(unittest.TestCase):
         patch.object(workbench, "SKILLS_ROOT", self.sources).start()
         patch.object(workbench, "REPOSITORY_ROOT", self.root).start()
         (self.root / "runtimes").mkdir()
-        (self.root / "runtimes/copilot.json").write_text(
+        (self.root / "runtimes/skills.json").write_text(
             json.dumps(
                 {
-                    "schema_version": 1,
-                    "runtime": "copilot",
-                    "personal_skills_directory": ".agents/skills",
+                    "schema_version": 2,
+                    "runtimes": ["copilot", "claude-code"],
+                    "personal_skills_directory": ".claude/skills",
                 }
             )
         )
@@ -61,10 +61,10 @@ class CopilotInstallerTests(unittest.TestCase):
         return directory
 
     def destination(self, name="example-one"):
-        return self.home / ".agents/skills" / name
+        return self.home / ".claude/skills" / name
 
     def manifest(self, name="example-one"):
-        return self.state / "agent-workbench/installations/copilot" / f"{name}.json"
+        return self.state / "agent-workbench/installations/skills" / f"{name}.json"
 
     def install(self, name="example-one"):
         workbench.install(self.home, self.state, name, True)
@@ -187,7 +187,7 @@ class CopilotInstallerTests(unittest.TestCase):
         self.install()
         manifest = json.loads(self.manifest().read_text())
         self.assertEqual(manifest["version"], 2)
-        self.assertEqual(manifest["runtime"], "copilot")
+        self.assertEqual(manifest["runtime"], "shared")
         self.assertEqual(manifest["destination"], str(self.destination()))
         self.assertEqual(
             set(manifest["files"]),
@@ -300,11 +300,10 @@ class HandoffAndCliTests(unittest.TestCase):
             check=False,
         )
 
-    def test_help_explicitly_limits_installation_to_copilot(self):
+    def test_help_names_both_runtimes(self):
         help_text = self.run_cli("--help")
         self.assertEqual(help_text.returncode, 0)
-        self.assertIn("Copilot-only", help_text.stdout)
-        self.assertIn("not supported yet", help_text.stdout)
+        self.assertIn("Copilot and Claude Code", help_text.stdout)
         invalid = self.run_cli("--runtime", "claude", "status")
         self.assertNotEqual(invalid.returncode, 0)
         unnamed = self.run_cli("install", "--activate")
@@ -313,7 +312,7 @@ class HandoffAndCliTests(unittest.TestCase):
     def test_cli_status_has_no_writes(self):
         result = self.run_cli("status", "engineering-workbench")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("Copilot / engineering-workbench: not installed", result.stdout)
+        self.assertIn("Skills / engineering-workbench: not installed", result.stdout)
         self.assertFalse(self.home.exists())
         self.assertFalse(self.state.exists())
 
