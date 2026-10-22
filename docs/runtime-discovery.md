@@ -21,6 +21,9 @@ Checked against the VS Code and Claude Code docs on **22 October 2026**.
 uses it ([wiring](../runtimes/skills.json)). Installing into two folders would
 make Copilot list each skill twice.
 
+**Observed 22 October 2026:** after one install there, each skill appeared
+exactly once in both a new Copilot (Agents window) chat and Claude Code.
+
 Plugin skills, such as Superpowers, may appear with a prefix
 (`superpowers:brainstorming`) in both runtimes.
 
