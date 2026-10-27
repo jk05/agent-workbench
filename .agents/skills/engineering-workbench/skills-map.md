@@ -25,6 +25,7 @@ skill from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
 | pause, resume | this workbench: [handoffs.md](handoffs.md) | workbench |
 | reverse-engineer | `reverse-engineer-anything` (optional, consent) | user |
 | retro | `retro` (this repo) | workbench |
+| ideas | `ideas` (this repo) | workbench |
 
 ## Phase handoffs
 

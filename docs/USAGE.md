@@ -64,6 +64,23 @@ applies it only after you approve the diff: on a `retro/` branch in your clone
 (path from `~/.agent-workbench/config`), with checks run, asking before any
 push. Each retro is logged in `~/.agent-workbench/retros.md`.
 
+## Ideas
+
+Say "save this as a workbench idea" to keep a curated public summary in
+[the inbox](../IDEAS.md), rather than losing it in chat history. The `ideas`
+skill uses the clone path in `~/.agent-workbench/config`, just like `retro`.
+Install it with `python3 scripts/workbench.py install ideas --activate`.
+
+Say "review workbench ideas" for an on-demand review. Retro also consults
+open ideas relevant to the task's observed friction. A review recommends a
+candidate and next step, or no change; it never automatically adopts a tool.
+Entries stay open until a disposition is approved. Adopted entries reference
+the applied change; declined entries keep the reason.
+
+The inbox is public: no transcripts or private project details. Saving an idea
+does not activate instructions or grant permission to install or publish.
+There is no scheduled review; weekly automation is deferred.
+
 ## Handoffs
 
 Ask the agent to pause; it saves a private Markdown handoff. In a new chat,

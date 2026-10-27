@@ -31,13 +31,13 @@ Requires Python 3.9+. Works in **VS Code Copilot** and **Claude Code**.
    ```sh
    git clone https://github.com/jk05/agent-workbench.git
    cd agent-workbench
-   for name in engineering-workbench retro lean-comments \
+   for name in engineering-workbench retro ideas lean-comments \
        code-simplification workbench-reviewer; do
      python3 scripts/workbench.py install "$name" --activate
    done
    ```
 
-3. Tell `retro` where your clone is:
+3. Tell `retro` and `ideas` where your clone is:
 
    ```sh
    mkdir -p ~/.agent-workbench
@@ -52,6 +52,7 @@ Requires Python 3.9+. Works in **VS Code Copilot** and **Claude Code**.
 <summary>More</summary>
 
 - [Usage](docs/USAGE.md): install, update, remove, handoffs, project notes.
+- [Ideas](IDEAS.md): saved candidates for future workbench improvements.
 - [Why this design](docs/PROJECT-INTENT.md): decisions and boundaries.
 - [Runtime discovery](docs/runtime-discovery.md): why one install serves both.
 - [Tests](tests/README.md): helper and skill-structure checks.
