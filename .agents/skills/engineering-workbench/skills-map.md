@@ -17,7 +17,7 @@ skill from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
 | debug | `systematic-debugging` | Superpowers |
 | comments | `lean-comments` | awesome-copilot |
 | simplify | `code-simplification` | Addy Osmani |
-| review | `requesting-code-review`, then `workbench-reviewer` | Superpowers |
+| review | `requesting-code-review` via `workbench-reviewer` | Superpowers |
 | receive-review | `receiving-code-review` | Superpowers |
 | verify | `verification-before-completion` | Superpowers |
 | deliver, CI to green | this workbench: [delivery.md](delivery.md) | workbench |
@@ -25,6 +25,19 @@ skill from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
 | pause, resume | this workbench: [handoffs.md](handoffs.md) | workbench |
 | reverse-engineer | `reverse-engineer-anything` (optional, consent) | user |
 | retro | `retro` (this repo) | workbench |
+
+## Phase handoffs
+
+- **Planning:** `brainstorming` produces the approved design; `writing-plans`
+  uses it to produce the implementation plan. Workbench then requests approval
+  of that plan and delivery permissions, carrying forward decisions already
+  settled rather than restarting the interview.
+- **Review:** use `requesting-code-review` to prepare the brief and handle the
+  review process. Its reviewer dispatch uses `workbench-reviewer` (or the
+  project's own reviewer) instead of `general-purpose`, with the skill's
+  template, plan, acceptance criteria, and diff or commit range. This fulfills
+  that review step; it is not a second review. Use `receiving-code-review` to
+  assess the findings.
 
 ## Install notes
 
