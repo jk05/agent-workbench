@@ -19,6 +19,10 @@ These instructions protect scope and user-owned files during maintenance.
   outside repositories.
 - Obtain explicit approval before user-wide installation, live configuration
   changes, publishing, or retirement of existing customizations.
+- Approval to update workbench `main` includes refreshing changed,
+  already-installed skills and agents in both runtimes from `main`.
+  Verify installed copies match source; report conflicts without overwriting
+  local edits. New components still require installation approval.
 - Preserve unrelated content. Cover ownership, drift, removal, and ordinary
   write-error rollback with deterministic fixture tests.
 - Changes need the unit tests and markdownlint below. Report unrun or limited
