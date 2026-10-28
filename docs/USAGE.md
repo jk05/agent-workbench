@@ -24,6 +24,10 @@ python3 scripts/workbench.py remove engineering-workbench --confirm-removal
 - **Agents:** `.agents/agents/<name>.md` installs the same way, copied to
   `~/.claude/agents/` and `~/.copilot/agents/`.
 - **Update:** edit the source, run the tests, install again.
+- **After updating workbench `main`:** refresh changed, already-installed
+  skills and agents from `main` in both runtimes and verify they match source.
+  Approval to update `main` includes this refresh; new components still need
+  installation approval. Report installer conflicts without overwriting edits.
 - **Safety:** the helper only touches files it installed. It refuses to
   overwrite edits you made to the installed copy or unmanaged files, keeps
   files you added, and restores changed files if a write fails.

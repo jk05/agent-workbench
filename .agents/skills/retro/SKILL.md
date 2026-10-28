@@ -66,13 +66,17 @@ pinned commit with a `NOTICE.md` (see existing examples).
    `retro/<short-slug>` branch.
 3. Apply the diff and run the checks listed in the repo's `AGENTS.md`.
 4. Commit with a plain message, following the repo's conventions.
-5. Ask before pushing, opening a PR, or merging. Reinstall changed skills or
-   agents (`python3 scripts/workbench.py install <name> --activate`) only
-   with approval. Add the `retro` label to retro PRs; create it if missing
-   when publication is approved.
+5. Ask before pushing, opening a PR, or merging. Add the `retro` label to
+   retro PRs; create it if missing when publication is approved.
 6. After a workbench PR is confirmed merged into `main`, update local
    `main` and delete its local and remote source branch. Never force-delete
    an unmerged branch.
+7. Whenever workbench `main` is updated, reinstall changed, already-installed
+   skills and agents from `main` for Copilot and Claude Code using
+   `python3 scripts/workbench.py install <name> --activate`. This refresh is
+   included in approval to update `main`; installing new components still
+   requires approval. Verify installed copies match source and report any
+   installer conflicts without overwriting local edits.
 
 ## 5. Log it
 

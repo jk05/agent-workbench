@@ -17,7 +17,8 @@ names them. Sources for now: [Superpowers](https://github.com/obra/superpowers),
 3. Retro            you say "retro" -> one small improvement to this repo
 ```
 
-Merging, deploying, ticket writes, and installs always come back to you.
+Merging, deploying, ticket writes, and new installs come back to you.
+Approved workbench `main` updates include refreshing existing installations.
 
 ## How
 
