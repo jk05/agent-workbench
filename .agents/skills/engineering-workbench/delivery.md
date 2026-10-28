@@ -10,6 +10,30 @@ are distinct actions. An approved delivery sequence covers the actions it
 names; do not ask again for each. Without publication approval, leave the
 validated local changes and a draft PR description in the response.
 
+## PR descriptions
+
+Start from the repository template and follow repository requirements.
+Where allowed, omit irrelevant optional sections rather than filling them
+with empty checklists. Keep Proof focused on a short video or screenshot
+when useful, plus a few relevant test results with commands and outcomes.
+Keep routine lint/build logs out of Proof; put material failures or
+limitations under Considerations. Retain the full validation record in
+session evidence, not the PR description.
+
+## Visual evidence
+
+- Screenshots: use native macOS capture (Screenshot/Cmd+Shift+4/5 or
+  `screencapture`), scoped to the intended window or region.
+- Synthetic annotated walkthroughs: reuse a saved local renderer with
+  structured inputs; do not generate a new renderer for each task. Label
+  these as illustrations, not proof of actual application execution.
+- Otherwise, ask the user to record in Loom. Retrieve the recording's
+  share URL through the available Atlassian MCP and add it to the PR
+  through GitHub MCP. Do not promise MCP desktop recording or visual
+  annotation features without verifying them.
+- Verify caption/highlight alignment and exclude sensitive content.
+  Recording and publication still require the applicable permissions.
+
 ## What green means
 
 Discover the project's bar; never write one into its repo. In order: its

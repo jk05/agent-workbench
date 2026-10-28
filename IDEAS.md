@@ -8,6 +8,24 @@ Each entry has a stable ID, source, takeaway, when it might help, and status:
 `open`, `adopted`, or `declined`. Keep the reason for a decision; mark adopted
 only after the approved change is applied, with a reference to the change.
 
+## native-and-generated-video-proof
+
+- Source: user suggestion.
+- Takeaway: use native macOS tools for screenshots. For synthetic annotated
+  walkthroughs, reuse a local renderer with structured inputs rather than
+  generating a new renderer each time. Otherwise the user records in Loom;
+  use the existing Atlassian MCP to retrieve the share URL and GitHub MCP
+  to link it in the PR.
+- When useful: concise visual evidence or an explanation communicates better
+  than command logs.
+- Status: adopted in
+  [delivery guidance](.agents/skills/engineering-workbench/delivery.md#visual-evidence)
+  on `retro/concise-pr-proof`.
+- Review note: label synthetic illustrations; they are not execution proof.
+  Verify scope, permissions and sensitive content before capture/publication.
+  The private renderer accepts structured scene inputs. Loom MCP recording
+  and burned-in annotation are not verified capabilities.
+
 ## pstack-task-paths
 
 - Source: [pstack](https://github.com/backnotprop/pstack)
