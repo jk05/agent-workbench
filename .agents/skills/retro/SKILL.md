@@ -70,6 +70,9 @@ pinned commit with a `NOTICE.md` (see existing examples).
    agents (`python3 scripts/workbench.py install <name> --activate`) only
    with approval. Add the `retro` label to retro PRs; create it if missing
    when publication is approved.
+6. After a workbench PR is confirmed merged into `main`, update local
+   `main` and delete its local and remote source branch. Never force-delete
+   an unmerged branch.
 
 ## 5. Log it
 
