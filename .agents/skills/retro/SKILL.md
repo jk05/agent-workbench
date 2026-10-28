@@ -29,6 +29,11 @@ letting it grow.
 
 ## 2. Pick one fix
 
+Before proposing a change, search existing workbench instructions, skills,
+and docs for equivalent or conflicting guidance. Report what already covers
+the request. Reuse or sharpen it rather than duplicating it, and reconcile
+contradictions in the same diff. If already covered, propose no change.
+
 Prefer, in this order:
 
 1. change a row in `engineering-workbench/skills-map.md`
