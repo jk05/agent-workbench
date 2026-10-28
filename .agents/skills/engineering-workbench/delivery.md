@@ -20,6 +20,14 @@ Keep routine lint/build logs out of Proof; put material failures or
 limitations under Considerations. Retain the full validation record in
 session evidence, not the PR description.
 
+Before publishing or updating, check the final PR text:
+
+- Use concise bullets in each prose section, grouped under short headings
+  or bold labels where helpful, with no blank lines between related bullets.
+- Keep only relevant tests and material considerations.
+- Write PR review comments as one or two short, plain sentences explaining
+  the reasoning, without repeating the code or PR description.
+
 ## Visual evidence
 
 - Screenshots: use native macOS capture (Screenshot/Cmd+Shift+4/5 or
