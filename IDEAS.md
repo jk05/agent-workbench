@@ -11,14 +11,20 @@ only after the approved change is applied, with a reference to the change.
 ## native-and-generated-video-proof
 
 - Source: user suggestion.
-- Takeaway: check native macOS capture tools for real screen recordings;
-  use a local renderer for synthetic annotated walkthroughs. Check capture,
-  annotation and attachment capabilities separately before promising them.
-- When useful: a short visual explains behavior better than command logs.
-- Status: open.
-- Review note: obtain capture permissions, avoid sensitive content, and
-  verify caption/highlight alignment. Native annotation automation remains
-  unverified; this is not approval to install or activate tooling.
+- Takeaway: use native macOS tools for screenshots. For synthetic annotated
+  walkthroughs, reuse a local renderer with structured inputs rather than
+  generating a new renderer each time. Otherwise the user records in Loom;
+  use the existing Atlassian MCP to retrieve the share URL and GitHub MCP
+  to link it in the PR.
+- When useful: concise visual evidence or an explanation communicates better
+  than command logs.
+- Status: adopted in
+  [delivery guidance](.agents/skills/engineering-workbench/delivery.md#visual-evidence)
+  on `retro/concise-pr-proof`.
+- Review note: label synthetic illustrations; they are not execution proof.
+  Verify scope, permissions and sensitive content before capture/publication.
+  The private renderer accepts structured scene inputs. Loom MCP recording
+  and burned-in annotation are not verified capabilities.
 
 ## pstack-task-paths
 

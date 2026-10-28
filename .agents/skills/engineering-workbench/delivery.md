@@ -20,6 +20,20 @@ Keep routine lint/build logs out of Proof; put material failures or
 limitations under Considerations. Retain the full validation record in
 session evidence, not the PR description.
 
+## Visual evidence
+
+- Screenshots: use native macOS capture (Screenshot/Cmd+Shift+4/5 or
+  `screencapture`), scoped to the intended window or region.
+- Synthetic annotated walkthroughs: reuse a saved local renderer with
+  structured inputs; do not generate a new renderer for each task. Label
+  these as illustrations, not proof of actual application execution.
+- Otherwise, ask the user to record in Loom. Retrieve the recording's
+  share URL through the available Atlassian MCP and add it to the PR
+  through GitHub MCP. Do not promise MCP desktop recording or visual
+  annotation features without verifying them.
+- Verify caption/highlight alignment and exclude sensitive content.
+  Recording and publication still require the applicable permissions.
+
 ## What green means
 
 Discover the project's bar; never write one into its repo. In order: its

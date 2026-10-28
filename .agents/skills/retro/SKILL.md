@@ -68,7 +68,8 @@ pinned commit with a `NOTICE.md` (see existing examples).
 4. Commit with a plain message, following the repo's conventions.
 5. Ask before pushing, opening a PR, or merging. Reinstall changed skills or
    agents (`python3 scripts/workbench.py install <name> --activate`) only
-   with approval.
+   with approval. Add the `retro` label to retro PRs; create it if missing
+   when publication is approved.
 
 ## 5. Log it
 
