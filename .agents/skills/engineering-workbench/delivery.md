@@ -10,6 +10,16 @@ are distinct actions. An approved delivery sequence covers the actions it
 names; do not ask again for each. Without publication approval, leave the
 validated local changes and a draft PR description in the response.
 
+## PR descriptions
+
+Start from the repository template and follow repository requirements.
+Where allowed, omit irrelevant optional sections rather than filling them
+with empty checklists. Keep Proof focused on a short video or screenshot
+when useful, plus a few relevant test results with commands and outcomes.
+Keep routine lint/build logs out of Proof; put material failures or
+limitations under Considerations. Retain the full validation record in
+session evidence, not the PR description.
+
 ## What green means
 
 Discover the project's bar; never write one into its repo. In order: its

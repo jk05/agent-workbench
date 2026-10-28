@@ -8,6 +8,18 @@ Each entry has a stable ID, source, takeaway, when it might help, and status:
 `open`, `adopted`, or `declined`. Keep the reason for a decision; mark adopted
 only after the approved change is applied, with a reference to the change.
 
+## native-and-generated-video-proof
+
+- Source: user suggestion.
+- Takeaway: check native macOS capture tools for real screen recordings;
+  use a local renderer for synthetic annotated walkthroughs. Check capture,
+  annotation and attachment capabilities separately before promising them.
+- When useful: a short visual explains behavior better than command logs.
+- Status: open.
+- Review note: obtain capture permissions, avoid sensitive content, and
+  verify caption/highlight alignment. Native annotation automation remains
+  unverified; this is not approval to install or activate tooling.
+
 ## pstack-task-paths
 
 - Source: [pstack](https://github.com/backnotprop/pstack)
