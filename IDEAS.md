@@ -19,7 +19,7 @@ only after the approved change is applied, with a reference to the change.
 - When useful: concise visual evidence or an explanation communicates better
   than command logs.
 - Status: adopted in
-  [delivery guidance](.agents/skills/engineering-workbench/delivery.md#visual-evidence)
+  [delivery guidance](.agents/skills/workbench-delivery/SKILL.md#visual-evidence)
   on `retro/concise-pr-proof`.
 - Review note: label synthetic illustrations; they are not execution proof.
   Verify scope, permissions and sensitive content before capture/publication.

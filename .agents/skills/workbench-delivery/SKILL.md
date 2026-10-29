@@ -1,3 +1,8 @@
+---
+name: workbench-delivery
+description: Use before creating or editing PR descriptions or review comments, producing screenshots or annotated videos, or delivering changes through CI. Also applies when resuming these actions.
+---
+
 # Delivery: draft PR to green CI
 
 Read this when committing, pushing, opening or updating a PR, watching CI,
@@ -62,7 +67,8 @@ configs. Private extras, such as known flaky tests, live in
    separate pre-existing or environment failures from regressions.
 4. Fix in-scope failures locally, rerun the local checks, push, and watch again.
    Before every push, inspect the diff for anything that weakens the quality
-   floor in [SKILL.md](SKILL.md); if present, stop and report.
+   floor in [Engineering Workbench](../engineering-workbench/SKILL.md); if
+   present, stop and report.
 5. Stop when CI is green, after two failed repairs with the same root cause, or
    when the agreed time budget runs out. Report the PR, head SHA, pending,
    skipped, failed, and unavailable checks, unresolved threads, and next action.

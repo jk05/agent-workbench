@@ -32,8 +32,8 @@ Requires Python 3.9+. Works in **VS Code Copilot** and **Claude Code**.
    ```sh
    git clone https://github.com/jk05/agent-workbench.git
    cd agent-workbench
-   for name in engineering-workbench retro ideas lean-comments \
-       code-simplification workbench-reviewer; do
+   for name in engineering-workbench workbench-delivery retro ideas \
+       lean-comments code-simplification workbench-reviewer; do
      python3 scripts/workbench.py install "$name" --activate
    done
    ```

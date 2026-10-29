@@ -52,9 +52,13 @@ class EngineeringWorkbenchSkillTests(unittest.TestCase):
         roles = set(re.findall(r"\(role: ([a-z-]+)\)", skill))
         self.assertTrue(roles)
         self.assertEqual(roles - mapped, set())
-        for document in SKILL_DIRECTORY.glob("*.md"):
+        documents = [
+            *SKILL_DIRECTORY.glob("*.md"),
+            ROOT / ".agents/skills/workbench-delivery/SKILL.md",
+        ]
+        for document in documents:
             for target in re.findall(r"\]\(([^)#:]+\.md)\)", document.read_text()):
-                self.assertTrue((SKILL_DIRECTORY / target).is_file(), target)
+                self.assertTrue((document.parent / target).is_file(), target)
 
 
 if __name__ == "__main__":
