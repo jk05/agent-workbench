@@ -73,8 +73,8 @@ base strategy, or permissions must change. For each slice:
 5. **Verify** (role: verify): run the workspace's checks for affected behavior
    and record the revision and exact outcomes. Earlier results do not validate
    a later revision.
-6. **Deliver**: follow [delivery.md](delivery.md) for commits, the draft PR,
-   CI to green, review feedback, and dependent PRs.
+6. **Deliver** (role: deliver): load the mapped skill for commits, the draft
+   PR, CI to green, review feedback, visual evidence, and dependent PRs.
 
 **Failures** (role: debug): diagnose from evidence and separate environment or
 baseline failures from regressions. After two failed repairs with the same root
@@ -97,7 +97,8 @@ If that is the only route, stop and report.
 
 ## Read when needed
 
-- [delivery.md](delivery.md): push, draft PR, CI to green, feedback, stacked PRs.
+- [workbench-delivery](../workbench-delivery/SKILL.md): PRs, CI, feedback,
+  visual evidence.
 - [follow-ups.md](follow-ups.md): useful work found outside the approved scope.
 - [handoffs.md](handoffs.md): pause, resume, and the fresh-session review fallback.
 - [capabilities.md](capabilities.md): choosing tools, reverse engineering, delegation.

@@ -20,7 +20,7 @@ skill from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
 | review | `requesting-code-review` via `workbench-reviewer` | Superpowers |
 | receive-review | `receiving-code-review` | Superpowers |
 | verify | `verification-before-completion` | Superpowers |
-| deliver, CI to green | this workbench: [delivery.md](delivery.md) | workbench |
+| deliver | `workbench-delivery` | workbench |
 | follow-ups, tickets | this workbench: [follow-ups.md](follow-ups.md) | workbench |
 | pause, resume | this workbench: [handoffs.md](handoffs.md) | workbench |
 | reverse-engineer | `reverse-engineer-anything` (optional, consent) | user |
