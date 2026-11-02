@@ -77,7 +77,10 @@ base strategy, or permissions must change. For each slice:
    PR, CI to green, review feedback, visual evidence, and dependent PRs.
 
 **Failures** (role: debug): diagnose from evidence and separate environment or
-baseline failures from regressions. After two failed repairs with the same root
+baseline failures from regressions. For CI, identify the failing job's execution
+environment and compare equivalent passing jobs; distinguish observed failures
+from inferred scope and the necessary fix from additional maintenance.
+After two failed repairs with the same root
 cause, stop and report evidence, the blocker, and the next decision.
 
 **Quality floor:** never get green by weakening the bar. No new suppressions,
