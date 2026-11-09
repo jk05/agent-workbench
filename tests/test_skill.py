@@ -10,6 +10,25 @@ SKILL_LINE_LIMIT = 120
 
 
 class EngineeringWorkbenchSkillTests(unittest.TestCase):
+    def test_council_skill_is_discoverable_and_mapped(self):
+        skill = (ROOT / ".agents/skills/retro-council/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertTrue(skill.startswith("---\n"))
+        frontmatter, body = skill[4:].split("\n---\n", 1)
+        self.assertIn("name: retro-council", frontmatter.splitlines())
+        self.assertTrue(
+            any(
+                line.startswith("description: Use when ")
+                for line in frontmatter.splitlines()
+            )
+        )
+        self.assertNotIn("user-invocable: false", frontmatter)
+        self.assertTrue(body.strip())
+        self.assertLessEqual(len(skill.splitlines()), SKILL_LINE_LIMIT)
+        skills_map = (SKILL_DIRECTORY / "skills-map.md").read_text(encoding="utf-8")
+        self.assertIn("| retro-council | `retro-council`", skills_map)
+
     def test_example_skill_is_discoverable(self):
         skill = (SKILL_DIRECTORY / "SKILL.md").read_text(encoding="utf-8")
         self.assertTrue(skill.startswith("---\n"))

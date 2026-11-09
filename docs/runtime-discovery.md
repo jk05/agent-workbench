@@ -36,6 +36,14 @@ Plugin skills, such as Superpowers, may appear prefixed: `superpowers:<name>`.
 The runtime (VS Code calls it a harness) controls tools and discovery; the
 model only reasons. Choosing a Claude model inside Copilot still runs Copilot.
 
+`retro-council` uses native subagent model controls, not new runtime wiring.
+Skill discovery does not prove which models are selectable. It uses five
+agents with different lenses, aiming for three models where available.
+Confirm assignments each run; aliases and runtime policy may substitute models.
+Report actual identities from metadata where available, or mark them unverified.
+Model diversity is best effort and does not block a confirmed roster.
+A live council has not been validated in either runtime.
+
 ## Sources
 
 - [VS Code agent skills](https://code.visualstudio.com/docs/copilot/customization/agent-skills)

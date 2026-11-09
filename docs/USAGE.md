@@ -68,6 +68,27 @@ applies it only after you approve the diff: on a `retro/` branch in your clone
 (path from `~/.agent-workbench/config`), with checks run, asking before any
 push. Each retro is logged in `~/.agent-workbench/retros.md`.
 
+### Retro council
+
+Use `/retro-council` for five independent agent perspectives on what to add,
+change, or stop. Install it separately with approval:
+
+```sh
+python3 scripts/workbench.py install retro-council --activate
+```
+
+Contribute your opinions and confirm five agents with different review lenses,
+aiming for three models where available with best-effort model diversity.
+Then review a shortlist backed by at least three votes out of five. A council
+uses five proposal turns and five ballot turns. Your proposals stay visible
+regardless of votes; you choose what proceeds and can add or amend suggestions.
+Selected changes must pass a skill-reuse check before implementation: installed
+skills first, then relevant upstream options. Custom work needs an explicit gap.
+Normal retro handles each approved diff. No changes or installs are automatic.
+Limited model choice does not block the council: reused models and unverified
+identities are disclosed. Failed members yield an explicitly partial advisory
+result, never invented votes or a falsely completed council.
+
 ## Ideas
 
 Say "save this as a workbench idea" to keep a curated public summary in
