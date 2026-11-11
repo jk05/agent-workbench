@@ -14,7 +14,7 @@ skill from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
 | execute-plan | `subagent-driven-development`/`executing-plans` | Superpowers |
 | parallel | `dispatching-parallel-agents` | Superpowers |
 | build | `test-driven-development` | Superpowers |
-| debug | `systematic-debugging` | Superpowers |
+| debug | `systematic-debugging` + Docker helper below | Superpowers |
 | comments | `lean-comments` | awesome-copilot |
 | simplify | `code-simplification` | Addy Osmani |
 | review | `requesting-code-review` via `workbench-reviewer` | Superpowers |
@@ -30,6 +30,8 @@ skill from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
 
 ## Phase handoffs
 
+- **Debug:** for container/native-addon failures, also use `docker-expert`
+  (community adaptation). Systematic debugging remains primary.
 - **Planning:** `brainstorming` produces the approved design; `writing-plans`
   uses it to produce the implementation plan. Workbench then requests approval
   of that plan and delivery permissions, carrying forward decisions already
