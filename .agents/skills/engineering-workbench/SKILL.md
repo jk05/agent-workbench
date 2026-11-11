@@ -18,9 +18,12 @@ investigate -> interview -> plan  =>  build -> simplify -> review -> checks
 
 - Phases name a **role**, e.g. (role: build). Read [skills-map.md](skills-map.md),
   load the mapped skill if it is installed (plugin installs may prefix it,
-  e.g. `superpowers:test-driven-development`), and follow it. If it is not
-  installed, say so once and use the fallback here. Never claim to have loaded
-  a skill you did not load, and never install one without approval.
+  e.g. `superpowers:test-driven-development`), unless its context is already
+  active in the conversation; in that case, follow the existing context. If
+  repeated skill routing does not advance the task, stop routing and use the
+  relevant available tool or report the blocker. If it is not installed, say
+  so once and use the fallback here. Never claim to have loaded a skill you did
+  not load, and never install one without approval.
 - Workspace instructions, commands, and policy win over this skill and mapped
   skills. These preferences grant no permissions.
 - If `~/.agent-workbench/projects/<repo-name>/` exists, read it for private
