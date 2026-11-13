@@ -74,8 +74,10 @@ base strategy, or permissions must change. For each slice:
    request; it reports and you decide (role: receive-review). Fallback: a
    handoff so a fresh session reviews it.
 5. **Verify** (role: verify): run the workspace's checks for affected behavior
-   and record the revision and exact outcomes. Earlier results do not validate
-   a later revision.
+   and record the revision and exact outcomes. Check changed code with the
+   project's formatter when available, even if CI does not; distinguish existing
+   formatting from new issues and avoid unrelated reformatting. Earlier results
+   do not validate a later revision.
 6. **Deliver** (role: deliver): load the mapped skill for commits, the draft
    PR, CI to green, review feedback, visual evidence, and dependent PRs.
 
