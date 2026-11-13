@@ -87,6 +87,10 @@ Post replies only when permitted and under workspace disclosure policy.
 
 - While a PR waits for review, continue other approved, independent slices in
   isolated branches or worktrees.
+- Name each new worktree after its issue key or branch. Copy ignored local
+  `.env*` files from the existing checkout without overwriting files or
+  exposing their contents. After merge, remove the worktree once it has no
+  uncommitted changes.
 - A slice that depends on an unmerged PR needs an agreed base strategy
   (stacked or wait). Do not stack silently or merge to unblock it.
 - When a prerequisite changes, recheck dependants; their earlier results are stale.
