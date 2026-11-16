@@ -35,8 +35,20 @@ Before publishing or updating, check the final PR text:
 
 ## Visual evidence
 
-- Screenshots: use native macOS capture (Screenshot/Cmd+Shift+4/5 or
-  `screencapture`), scoped to the intended window or region.
+- Browser screenshots: use Playwright MCP to capture the relevant element
+  at CSS scale. Choose the viewport and crop so the subject is readable;
+  inspect each capture and the rendered PR.
+- For GitHub attachments, get the repository ID with
+  `gh api repos/OWNER/REPO --jq .id`, then upload each PNG with:
+  `gh api --method POST -H 'Accept: application/json' --input IMAGE
+  'https://uploads.github.com/user-attachments/assets?name=NAME&content_type=image%2Fpng&repository_id=ID'`.
+  URL-encode the filename. This endpoint is undocumented; if unavailable,
+  use GitHub's attachment UI. Confirm attachment visibility is appropriate.
+- Embed the returned URLs with descriptive alt text. For comparisons, use a
+  labelled Markdown table (e.g. before/after or v1/v2); update the PR through
+  GitHub MCP when available, preserving its template.
+- For desktop screenshots, use native macOS capture scoped to the intended
+  window or region when appropriate.
 - Synthetic annotated walkthroughs: reuse a saved local renderer with
   structured inputs; do not generate a new renderer for each task. Label
   these as illustrations, not proof of actual application execution.
