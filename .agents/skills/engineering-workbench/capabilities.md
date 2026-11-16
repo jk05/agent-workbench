@@ -52,6 +52,7 @@ never every role "just in case":
   verification commands. Run workers in parallel only on disjoint files.
 - Keep briefs short and closed-ended; ask for paths with line numbers, diffs,
   and command output, not narratives. Verify claims you have not seen output for.
-- Use the reviewer when risk warrants it; it is the most expensive step.
+- Run the independent review required by the workbench for each slice.
+  Additional reviews are risk-based; avoid duplicating a completed review.
 - Launch parallel agents only when delegation is approved. Treat unknown
   quota as unknown.

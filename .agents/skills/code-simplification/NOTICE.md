@@ -1,8 +1,10 @@
 # Source
 
-Copied unchanged from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills/tree/aeac41d4d005999432bb7312f7ff06383a91d59d/skills/code-simplification)
+Adapted from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills/tree/aeac41d4d005999432bb7312f7ff06383a91d59d/skills/code-simplification)
 at commit `aeac41d4d005999432bb7312f7ff06383a91d59d`.
-Update by copying a newer version deliberately.
+Local changes remove a behavior-changing example and keep refactors in the
+same PR by default, escalating large refactors to the user.
+Update deliberately, preserving these adaptations.
 
 ## License
 

@@ -75,20 +75,6 @@ function getStatusLabel(item: Item): string {
 }
 ```
 
-```typescript
-// UNCLEAR: Chained reduces with inline logic
-const result = items.reduce((acc, item) => ({
-  ...acc,
-  [item.id]: { ...acc[item.id], count: (acc[item.id]?.count ?? 0) + 1 }
-}), {});
-
-// CLEAR: Named intermediate step
-const countById = new Map<string, number>();
-for (const item of items) {
-  countById.set(item.id, (countById.get(item.id) ?? 0) + 1);
-}
-```
-
 ### 4. Maintain Balance
 
 Simplification has a failure mode: over-simplification. Watch for these traps:
@@ -156,7 +142,7 @@ Scan for these patterns — each one is a concrete signal, not a vague smell:
 
 ### Step 3: Apply Changes Incrementally
 
-Make one simplification at a time. Run tests after each change. **Submit refactoring changes separately from feature or bug fix changes.** A PR that refactors and adds a feature is two PRs — split them.
+Make one simplification at a time. Run tests after each change. Keep refactors in the same PR by default. If a refactor grows large enough to make the PR difficult to review or validate, flag its scale with the user and discuss whether it needs a separate ticket or PR; do not split automatically.
 
 ```
 FOR EACH SIMPLIFICATION:
