@@ -69,6 +69,11 @@ Discover the project's bar; never write one into its repo. In order: its
 configs. Private extras, such as known flaky tests, live in
 `~/.agent-workbench/projects/<repo-name>/`.
 
+Before declaring CI green, confirm every required check relevant to the change
+ran against the current head and exercised the changed code. Skipped, cancelled,
+or zero-test checks are not evidence; resolve them or report readiness as
+unverified.
+
 ## The CI-to-green loop
 
 1. Follow workspace branch, base, and title conventions. Check whether a PR
