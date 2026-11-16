@@ -38,7 +38,7 @@ Requires Python 3.9+. Works in **VS Code Copilot** and **Claude Code**.
    done
    ```
 
-3. Tell `retro` and `ideas` where your clone is:
+3. Tell workbench skills where your clone is:
 
    ```sh
    mkdir -p ~/.agent-workbench
@@ -49,11 +49,13 @@ Requires Python 3.9+. Works in **VS Code Copilot** and **Claude Code**.
 
    > Use engineering-workbench to investigate PE-1234. Plan only for now.
 
+For an optional source review, ask to review workbench ideas. To audit
+customizations, ask for a spring clean; install it separately with approval.
+
 <details>
 <summary>More</summary>
 
 - [Usage](docs/USAGE.md): install, update, remove, handoffs, project notes.
-- [Ideas](IDEAS.md): saved candidates for future workbench improvements.
 - [Why this design](docs/PROJECT-INTENT.md): decisions and boundaries.
 - [Runtime discovery](docs/runtime-discovery.md): why one install serves both.
 - [Tests](tests/README.md): helper and skill-structure checks.

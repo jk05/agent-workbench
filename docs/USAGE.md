@@ -36,8 +36,7 @@ python3 scripts/workbench.py remove engineering-workbench --confirm-removal
 
 ## Use the workflow
 
-Ask in a fresh Copilot Agents or Claude Code session, or type
-`/engineering-workbench`:
+Ask in a fresh Copilot Agents or Claude Code session:
 
 > Use engineering-workbench to investigate PE-1234. Plan only for now.
 
@@ -70,8 +69,8 @@ push. Each retro is logged in `~/.agent-workbench/retros.md`.
 
 ### Retro council
 
-Use `/retro-council` for five independent agent perspectives on what to add,
-change, or stop. Install it separately with approval:
+Ask to use retro council for five independent agent perspectives on what to
+add, change, or stop. Install it separately with approval:
 
 ```sh
 python3 scripts/workbench.py install retro-council --activate
@@ -89,22 +88,30 @@ Limited model choice does not block the council: reused models and unverified
 identities are disclosed. Failed members yield an explicitly partial advisory
 result, never invented votes or a falsely completed council.
 
-## Ideas
+## Ideas and spring clean
 
-Say "save this as a workbench idea" to keep a curated public summary in
-[the inbox](../IDEAS.md), rather than losing it in chat history. The `ideas`
-skill uses the clone path in `~/.agent-workbench/config`, just like `retro`.
-Install it with `python3 scripts/workbench.py install ideas --activate`.
+Ask to review workbench ideas, giving URLs or suggestions and optional
+comments. The `ideas` skill compares sources with existing capabilities and
+discusses what to adopt, adapt, reject or investigate. It keeps no backlog;
+asking to save an idea offers an immediate review instead.
 
-Say "review workbench ideas" for an on-demand review. Retro also consults
-open ideas relevant to the task's observed friction. A review recommends a
-candidate and next step, or no change; it never automatically adopts a tool.
-Entries stay open until a disposition is approved. Adopted entries reference
-the applied change; declined entries keep the reason.
+Ask for a spring clean to audit workbench and installed customizations for
+simplification. It reports discoverable coverage and recommends changes or
+focused trials; it does not edit configuration or run evaluations. Review
+and trial costs, changes, and installation each need their own approval.
 
-The inbox is public: no transcripts or private project details. Saving an idea
-does not activate instructions or grant permission to install or publish.
-There is no scheduled review; weekly automation is deferred.
+Install `ideas` or the new `spring-clean` separately with approval:
+
+```sh
+python3 scripts/workbench.py install ideas --activate
+python3 scripts/workbench.py install spring-clean --activate
+```
+
+After retro or council, either review may be offered, never started
+automatically. Use natural-language requests; discovery and slash command
+availability depend on the runtime and installation. Source and installed
+copies can differ until an approved refresh; old installed skills may still
+refer to or recreate the retired backlog.
 
 ## Handoffs
 

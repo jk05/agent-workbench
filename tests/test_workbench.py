@@ -3,6 +3,7 @@
 import importlib.util
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -293,6 +294,29 @@ class SkillInstallerTests(InstallerFixture):
 
 
 class PerRuntimeSkillTests(InstallerFixture):
+    def test_workbench_review_skills_install_in_both_runtimes(self):
+        for name in ("ideas", "spring-clean"):
+            source = SCRIPT.parent.parent / ".agents/skills" / name
+            shutil.copytree(source, self.sources / name)
+            self.install(name)
+            source_files = {
+                path.relative_to(source) for path in source.rglob("*") if path.is_file()
+            }
+            for runtime in (".agents", ".claude"):
+                copy = self.home / runtime / "skills" / name
+                copied_files = {
+                    path.relative_to(copy) for path in copy.rglob("*") if path.is_file()
+                }
+                self.assertEqual(copied_files, source_files)
+                for relative in source_files:
+                    self.assertEqual(
+                        (copy / relative).read_bytes(), (source / relative).read_bytes()
+                    )
+                    self.assertEqual(
+                        (copy / relative).stat().st_mode & 0o777,
+                        (source / relative).stat().st_mode & 0o777,
+                    )
+
     def test_skill_installs_identical_copies_per_runtime(self):
         self.install()
         copies = [

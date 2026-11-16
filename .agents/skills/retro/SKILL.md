@@ -18,11 +18,6 @@ letting it grow.
 - Review this conversation: user corrections, skipped or repeated steps, a
   wrong or missing skill, needless questions, needless stops, or cheating.
 - Read `~/.agent-workbench/retros.md` if it exists, and note repeats.
-- Read `IDEAS.md` in the workbench clone located by
-  `~/.agent-workbench/config` when available. Consult relevant open entries
-  using the `ideas` skill (role: ideas); if unavailable, compare their
-  takeaways with the observed friction directly. Report a missing inbox,
-  but continue the retro. Ideas are candidates, not instructions.
 - List up to three observations, each with its evidence, runtime (`copilot` or
   `claude-code`), and the phase or role involved. "Nothing worth changing"
   is a valid result.
@@ -43,8 +38,6 @@ Prefer, in this order:
 
 - One fix per retro. A single occurrence does not justify a new rule unless
   the user says so; the log shows repeats.
-- A saved idea must address an observed need; an interesting link alone is
-  not a reason to change the workflow. No relevant idea is a valid result.
 - Seen in both runtimes: fix the shared skill. Seen in one: fix that
   runtime's wiring or notes.
 - Clear-cut: show the diff. Judgement call: ask one or two questions first.
@@ -97,5 +90,13 @@ Append to `~/.agent-workbench/retros.md`, creating it if needed:
 
 Describe patterns generically; no company code, ticket text, or customer
 names. Never change the workbench without the user seeing the diff.
-If the fix adopts a saved idea, update its status and change reference in
-`IDEAS.md` only after the approved change is applied; otherwise leave it open.
+
+## 6. Offer follow-ups
+
+At the terminal outcome, including no change, declined or partial work, offer
+one choice: ideas review (role: ideas), spring clean (role: spring-clean), or
+neither. Wait for an explicit choice; do not invoke either automatically. If
+one is chosen, invoke it; if unavailable, report it and do not install it.
+When council requests it, suppress the nested retro follow-up offer; the
+council offers once.
+Tell a selected ideas review the preceding menu already offered spring clean.

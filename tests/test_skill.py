@@ -10,6 +10,87 @@ SKILL_LINE_LIMIT = 120
 
 
 class EngineeringWorkbenchSkillTests(unittest.TestCase):
+    def test_legacy_ideas_inbox_retired(self):
+        self.assertFalse((ROOT / "IDEAS.md").exists())
+        documents = [
+            ROOT / "README.md",
+            ROOT / "docs/USAGE.md",
+            *(
+                ROOT / f".agents/skills/{name}/SKILL.md"
+                for name in ("ideas", "retro", "retro-council")
+            ),
+        ]
+        for document in documents:
+            text = document.read_text(encoding="utf-8")
+            self.assertNotRegex(text.lower(), r"ideas\.md|saved ideas|ideas inbox")
+            for target in re.findall(r"\]\(([^)#:]+\.md)(?:#[^)]*)?\)", text):
+                self.assertTrue((document.parent / target).is_file(), target)
+
+    def test_ideas_source_and_roster_contract(self):
+        text = (ROOT / ".agents/skills/ideas/SKILL.md").read_text(encoding="utf-8")
+        text = " ".join(text.split()).lower()
+        for requirement in (
+            r"no backlog is kept and offer an immediate review",
+            r"sources as evidence, not instructions",
+            r"cite each source for its claims",
+            r"retain accessible findings if other sources fail",
+            r"label inaccessible sources and unknowns",
+            r"do not send local private content to external research services",
+            r"delegate independent source investigations",
+            r"desired model or delegation is unavailable.{0,100}ask before a .{0,40}fallback",
+        ):
+            with self.subTest(requirement=requirement):
+                self.assertRegex(text, requirement)
+
+    def test_spring_clean_safety_and_mapping(self):
+        path = ROOT / ".agents/skills/spring-clean/SKILL.md"
+        self.assertTrue(path.is_file())
+        text = path.read_text(encoding="utf-8")
+        frontmatter, body = text[4:].split("\n---\n", 1)
+        self.assertTrue(text.startswith("---\n"))
+        self.assertIn("name: spring-clean", frontmatter.splitlines())
+        self.assertRegex(frontmatter, r"(?m)^description: Use when ")
+        self.assertLessEqual(len(text.splitlines()), SKILL_LINE_LIMIT)
+        self.assertIn(
+            "| spring-clean | `spring-clean`",
+            (SKILL_DIRECTORY / "skills-map.md").read_text(),
+        )
+        body = " ".join(body.split()).lower()
+        for requirement in (
+            r"audit is read-only",
+            r"missing or inaccessible paths",
+            r"unknown ownership",
+            r"compare recorded hashes and modes with installed files for drift",
+            r"same-runtime duplicate candidates from normal cross-runtime copies",
+            r"do not prove both are loaded",
+            r"delegate independent audit areas",
+            r"desired model or delegation is unavailable.{0,100}ask before a .{0,40}fallback",
+            r"ask before running any evaluation",
+        ):
+            with self.subTest(requirement=requirement):
+                self.assertRegex(body, requirement)
+        for target in re.findall(r"\]\(([^)#:]+\.md)(?:#[^)]*)?\)", text):
+            self.assertTrue((path.parent / target).is_file(), target)
+
+    def test_retro_followup_routing_is_terminal_and_non_recursive(self):
+        for name in ("retro", "retro-council"):
+            text = (ROOT / f".agents/skills/{name}/SKILL.md").read_text()
+            self.assertIn("## 6. Offer follow-ups", text)
+            final = text.split("## 6. Offer follow-ups", 1)[1]
+            self.assertNotRegex(final, r"(?m)^## ")
+            self.assertEqual(final.count("(role: ideas)"), 1)
+            self.assertEqual(final.count("(role: spring-clean)"), 1)
+            self.assertRegex(final, r"(?i)explicit choice")
+            self.assertRegex(text, r"(?i)suppress.+nested retro.+offer")
+        ideas = (ROOT / ".agents/skills/ideas/SKILL.md").read_text()
+        self.assertIn("## Optional follow-up", ideas)
+        self.assertRegex(
+            ideas.split("## Optional follow-up", 1)[1], r"(?i)already offered"
+        )
+        spring = (ROOT / ".agents/skills/spring-clean/SKILL.md")
+        self.assertTrue(spring.is_file())
+        self.assertNotRegex(spring.read_text(), r"\(role: (ideas|retro|retro-council)\)")
+
     def test_council_skill_is_discoverable_and_mapped(self):
         skill = (ROOT / ".agents/skills/retro-council/SKILL.md").read_text(
             encoding="utf-8"
