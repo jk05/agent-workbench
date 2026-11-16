@@ -26,7 +26,8 @@ skill from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
 | reverse-engineer | `reverse-engineer-anything` (optional, consent) | user |
 | retro | `retro` (this repo) | workbench |
 | retro-council | `retro-council` (optional, explicit request) | workbench |
-| ideas | `ideas` (this repo) | workbench |
+| ideas | `ideas` (optional review) | workbench |
+| spring-clean | `spring-clean` (optional, explicit request) | workbench |
 
 ## Phase handoffs
 

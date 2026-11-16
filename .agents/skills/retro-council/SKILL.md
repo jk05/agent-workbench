@@ -18,7 +18,7 @@ your input -> confirm five agents -> independent proposals -> shared ballot
 - Invite the user's opinions and add/change/stop proposals first. Use supplied
   arguments as initial input; let the user add more or skip.
 - Use retro's evidence-gathering and existing-coverage checks (sections 1-2):
-  current conversation, private retro log, configured clone and relevant ideas.
+  current conversation, private retro log and configured clone.
   Consult relevant prior sessions when available; report missing evidence.
 - Prepare one shared packet with observations, evidence, runtime and phase,
   existing guidance, and user proposals. Separate preferences from failures.
@@ -101,6 +101,16 @@ For every selected proposal, before drafting an implementation diff:
    explicit approval; follow retro's pinned-source and notice requirements.
 
 Then invoke retro for each selected improvement, one focused diff at a time,
-carrying forward evidence, votes, user input and the reuse decision. Reuse its
-diff approval, delivery and private logging workflow; retain existing approvals.
-Record actual outcome and whether the council completed, not an invented result.
+carrying forward evidence, votes, user input and the reuse decision. Instruct
+it to suppress the nested retro follow-up offer. Reuse its diff approval,
+delivery and private logging workflow; retain existing approvals. Record actual
+outcome and whether the council completed, not an invented result.
+
+## 6. Offer follow-ups
+
+At the terminal outcome, including an empty shortlist, no change, declined or
+partial work, offer one choice: ideas review (role: ideas), spring clean
+(role: spring-clean), or neither. Wait for an explicit choice; do not invoke
+either automatically. If one is chosen, invoke it; if unavailable, report it
+and do not install it. Tell a selected ideas review the preceding menu already
+offered spring clean.

@@ -18,7 +18,8 @@ python3 -m unittest discover -s tests -v
 | [test_workbench.py](test_workbench.py) | Install/update/remove, drift, rollback |
 | [test_skill.py](test_skill.py) | Frontmatter, line limit, mapped roles, links |
 
-Installer tests use fictional skills and temporary homes.
+Installer tests use fictional skills and the actual review skill folders in
+synthetic homes. They do not verify live installation or runtime discovery.
 **Green unit tests do not mean the agent follows the skill.** Try behavior
 changes on a real task.
 
