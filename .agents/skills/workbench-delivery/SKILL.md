@@ -29,7 +29,9 @@ Before publishing or updating, check the final PR text:
 
 - Use concise bullets in each prose section, grouped under short headings
   or bold labels where helpful, with no blank lines between related bullets.
-- Keep only relevant tests and material considerations.
+- Lead with feature-level context and current scope. Include only relevant
+  tests and current, material risks or limitations; describe them accurately
+  and proportionately, without resolved debugging history.
 - Write PR review comments as one or two short, plain sentences explaining
   the reasoning, without repeating the code or PR description.
 
