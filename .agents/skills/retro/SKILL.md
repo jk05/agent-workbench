@@ -18,6 +18,10 @@ letting it grow.
 - Review this conversation: user corrections, skipped or repeated steps, a
   wrong or missing skill, needless questions, needless stops, or cheating.
 - Read `~/.agent-workbench/retros.md` if it exists, and note repeats.
+- If the project is known, check relevant notes in
+  `~/.agent-workbench/projects/<repo-name>/` when present. Consider them as
+  evidence and existing guidance, including whether they need updating; keep
+  their contents private.
 - List up to three observations, each with its evidence, runtime (`copilot` or
   `claude-code`), and the phase or role involved. "Nothing worth changing"
   is a valid result.
