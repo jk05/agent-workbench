@@ -31,6 +31,10 @@ skill from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
 
 ## Phase handoffs
 
+- **Workspace:** Before the first commit or PR, check the task branch and
+  isolated worktree against applicable naming preferences. If host-controlled
+  names cannot be selected, explain the limitation and agree how to proceed;
+  do not move or recreate an existing managed worktree to fix its name.
 - **Debug:** for container/native-addon failures, also use `docker-expert`
   (community adaptation). Systematic debugging remains primary.
 - **Planning:** `brainstorming` produces the approved design; `writing-plans`

@@ -39,9 +39,9 @@ investigate -> interview -> plan  =>  build -> simplify -> review -> checks
 
 ## Checkpoint 1: plan together
 
-1. **Investigate.** Workspace instructions, Git status and branch, relevant code
-   and tests, and the ticket if one is given (use an available tracker; else
-   use supplied text and say what was not fetched). Preserve unrelated work.
+1. **Investigate.** Workspace instructions, Git status and branch/worktree naming
+   (see skills-map), relevant code/tests and the ticket (use a tracker if available;
+   else use supplied text and say what was not fetched). Preserve unrelated work.
    A missing optional tool is not a blocker: state the evidence gap.
 2. **Interview** (role: plan-interview). Answer what evidence can; ask about
    consequential unknowns: outcome, measurable acceptance criteria (turn vague
