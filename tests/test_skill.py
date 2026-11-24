@@ -63,8 +63,10 @@ class EngineeringWorkbenchSkillTests(unittest.TestCase):
             r"compare recorded hashes and modes with installed files for drift",
             r"same-runtime duplicate candidates from normal cross-runtime copies",
             r"do not prove both are loaded",
-            r"delegate independent audit areas",
-            r"desired model or delegation is unavailable.{0,100}ask before a .{0,40}fallback",
+            r"audit directly when the scope fits a single reviewer",
+            r"delegate independent areas only when additional context warrants it",
+            r"approval before expensive delegation",
+            r"delegation is unavailable.{0,100}continue directly without impersonating reviewers",
             r"ask before running any evaluation",
         ):
             with self.subTest(requirement=requirement):
