@@ -18,16 +18,15 @@ changes require separate explicit approval.
   Claude Code: skills, agents, plugins, instruction files, hooks, MCP and
   other configuration. Inventory only locations and integrations discoverable
   in the current environment; do not claim complete discovery.
-- Use a top available model for orchestration where runtime and user policy
-  permit. Propose a bounded roster and delegate independent audit areas where
-  supported and permitted. Explain scope, expected calls and usage, and obtain
-  approval before expensive delegation. Follow runtime model and tool controls;
-  cite actual model identities only from verified metadata, otherwise mark them
-  unverified. Disclose known providers and data-sharing implications; never
-  send private material to an external agent provider without policy
-  permission and explicit consent. If a desired model or delegation is
-  unavailable, disclose it and ask before a serial or lower-capability
-  fallback. Without an answer, stop rather than impersonating reviewers.
+- Audit directly when the scope fits a single reviewer; delegate independent
+  areas only when additional context warrants it and runtime rules permit.
+  Explain scope, expected calls and usage, and obtain approval before expensive
+  delegation. If delegation is unavailable, report the limitation and continue
+  directly without impersonating reviewers. Follow runtime model and tool
+  controls; cite model identities only from verified metadata, otherwise mark
+  them unverified. Disclose known providers and data-sharing implications; never
+  send private material to an external agent provider without policy permission
+  and explicit consent.
 
 ## Inventory and assess
 
